@@ -9,6 +9,9 @@ public class PlayerMovement : MonoBehaviour
     public float acceleration = 20f;
     public float airControlMultiplier = 0.4f;
 
+    [Header("Gravity")]
+    [SerializeField] private float gravity = 15f;
+
     [Header("Jump")]
     public float jumpForce = 6f;
     public float groundCheckDistance = 0.2f;
@@ -16,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Look")]
     public Transform cameraPivot;
-    public float mouseSensitivity = 2f;
+    public float mouseSensitivity = 0.1f;
     public float minY = -80f;
     public float maxY = 80f;
 
@@ -30,12 +33,17 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isGrounded;
 
+    private bool jumpRequested;
+
 private CapsuleCollider capsule;
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        rb.useGravity = false;
+
         capsule = GetComponent<CapsuleCollider>();
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -52,26 +60,36 @@ private CapsuleCollider capsule;
         lookInput = context.ReadValue<Vector2>();
     }
 
-    public void OnJump(InputAction.CallbackContext context)
+   public void OnJump(InputAction.CallbackContext context)
     {
-
-    if (!context.performed) return;
-    if (!isGrounded) return;
-
-    rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        if (context.performed)
+        {
+            jumpRequested = true;
+        }
     }
-
   
 
     void Update()
     {
         HandleLook();
-        CheckGround();
     }
 
     void FixedUpdate()
     {
+        CheckGround();
         HandleMovement();
+
+        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+
+        if (jumpRequested)
+        {
+            jumpRequested = false;
+
+            if (isGrounded)
+            {
+                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            }
+        }
     }
 
   
