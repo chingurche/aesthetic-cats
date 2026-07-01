@@ -6,7 +6,11 @@ using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour
 {
+	public Noise.NormalizeMode normalizeMode;
+
 	public const int mapChunkSize = 128;
+
+    [Header("Noise")]
 	public float noiseScale;
 
 	public int octaves;
@@ -17,7 +21,13 @@ public class MapGenerator : MonoBehaviour
 	public int seed;
 	public Vector2 offset;
     public float meshHeightMultiplier;
+	
+    [Header("Slope Settings")]
+    public Vector2 slopeDirection = new Vector2(1, 0); // Направление склона
+    public float slopeIntensity = 2f;
 
+
+    [Header("Update")]
 	public bool autoUpdate;
 
 	Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
@@ -25,25 +35,25 @@ public class MapGenerator : MonoBehaviour
 
 	public void DrawMapInEditor()
 	{
-		MapData mapData = GenerateMapData();
+		MapData mapData = GenerateMapData(Vector2.zero);
         MapDisplay display = GetComponent<MapDisplay>();
 
         display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHeightMultiplier));
 	}
 
-	public void RequestMapData(Action<MapData> callback)
+	public void RequestMapData(Vector2 center, Action<MapData> callback)
 	{
 		ThreadStart threadStart = delegate
 		{
-			MapDataThread(callback);
+			MapDataThread(center, callback);
 		};
 
 		new Thread(threadStart).Start();
 	}
 
-	private void MapDataThread(Action<MapData> callback)
+	private void MapDataThread(Vector2 center, Action<MapData> callback)
 	{
-		MapData mapData = GenerateMapData();
+		MapData mapData = GenerateMapData(center);
 		lock (mapDataThreadInfoQueue)
 		{
 			mapDataThreadInfoQueue.Enqueue(new MapThreadInfo<MapData>(callback, mapData));
@@ -88,8 +98,19 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	private MapData GenerateMapData() {
-		float[,] noiseMap = Noise.GenerateNoiseMap (mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
+	private MapData GenerateMapData(Vector2 center) {
+		float[,] noiseMap = Noise.GenerateNoiseMap (
+			mapChunkSize, 
+			mapChunkSize, 
+			seed, 
+			noiseScale, 
+			octaves, 
+			persistance, 
+			lacunarity, 
+			center + offset, 
+			normalizeMode, 
+			slopeDirection, 
+			slopeIntensity);
 
 		return new MapData(noiseMap);
     }
