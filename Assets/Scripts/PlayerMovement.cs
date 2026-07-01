@@ -32,6 +32,8 @@ public class PlayerMovement : MonoBehaviour
     private float cameraPitch;
 
     private bool isGrounded;
+    public bool IsGrounded => isGrounded;
+    public float MaxSpeed => maxSpeed;
 
     private bool jumpRequested;
 
