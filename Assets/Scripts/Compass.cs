@@ -2,9 +2,15 @@ using UnityEngine;
 
 public class Compass : MonoBehaviour
 {
+    public enum TargetType {Object,Direction};
+
+    [Header("Target")]
+    [SerializeField] private TargetType targetType;
+    [SerializeField] private Transform target;
+    [SerializeField] private Vector2 targetDirection;
+
     [Header("References")]
     [SerializeField] private Transform player;
-    [SerializeField] private Transform depthTarget;
     [SerializeField] private RectTransform arrow;
 
 
@@ -17,8 +23,16 @@ public class Compass : MonoBehaviour
 
     private void Update()
     {
-        Vector3 direction = depthTarget.position - player.position;
-        direction.y = 0f;
+        Vector3 direction;
+        if (targetType == TargetType.Object)
+        {
+            direction = target.position - player.position;
+            direction.y = 0f;
+        }
+        else // if (targetType == TargetType.Direction)
+        {
+            direction = new Vector3(targetDirection.x, 0,targetDirection.y);
+        }
 
         if (direction.sqrMagnitude < 0.001f)
             return;
