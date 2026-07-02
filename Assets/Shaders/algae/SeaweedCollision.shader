@@ -65,6 +65,8 @@ Shader "Custom/SeaweedCollision"
 
         void vert (inout appdata_full v)
         {
+            float scaleXZ = length(float3(unity_ObjectToWorld[0].x, unity_ObjectToWorld[1].x, unity_ObjectToWorld[2].x));
+
             float heightMask = saturate((v.vertex.y - _BottomY) / (_TopY - _BottomY));
             float curveMask = heightMask * heightMask;
 
@@ -76,15 +78,17 @@ Shader "Custom/SeaweedCollision"
             float camDist = distance(_WorldSpaceCameraPos, rootWorldPos);
             float animFade = saturate(1.0 - (camDist / max(_AnimDistance, 0.1)));
 
-            float3 totalOffset = float3(_BaseBendDir.x, 0, _BaseBendDir.z) * _BendStrength * curveMask;
+            float3 totalOffset = float3(_BaseBendDir.x, 0, _BaseBendDir.z) * (_BendStrength * scaleXZ) * curveMask;
 
             if (animFade > 0.001)
             {
                 float time = _Time.y * _SwaySpeed;
+                
+                float actualSway = _SwayAmount * scaleXZ;
                 float3 swayVector = float3(
-                    sin(time + worldPos.x) * _SwayAmount,
+                    sin(time + worldPos.x) * actualSway,
                     0, 
-                    cos(time + worldPos.z) * _SwayAmount
+                    cos(time + worldPos.z) * actualSway
                 );
 
                 float2 diffXZ = rootWorldPos.xz - _UnitPosition.xz;
@@ -96,15 +100,16 @@ Shader "Custom/SeaweedCollision"
                 
                 float2 tangentDir = float2(-pushDir.y, pushDir.x) * dodgeSide;
                 
-                float partingStrength = smoothstep(1.2, 0.0, dist); 
+                float partingStrength = smoothstep(1.2 * scaleXZ, 0.0, dist); 
                 pushDir = normalize(pushDir + tangentDir * partingStrength * 1.5);
 
-
-                float rawStrength = saturate(1.0 - (dist / _CollisionRadius));
+                float actualRadius = _CollisionRadius * scaleXZ;
+                float rawStrength = saturate(1.0 - (dist / max(actualRadius, 0.001)));
                 
                 float strength = pow(rawStrength, 1.0 / max(_WaterDrag, 0.01)); 
                 
-                float3 collisionVector = float3(pushDir.x, 0, pushDir.y) * strength * _PushStrength;
+                float actualPush = _PushStrength * scaleXZ;
+                float3 collisionVector = float3(pushDir.x, 0, pushDir.y) * strength * actualPush;
 
                 totalOffset += (swayVector + collisionVector) * heightMask * animFade;
 

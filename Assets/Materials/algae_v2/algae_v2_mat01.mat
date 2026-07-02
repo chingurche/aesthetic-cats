@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: algae_mat02
+  m_Name: algae_v2_mat01
   m_Shader: {fileID: 4800000, guid: de7192d28e09f1341890d71c35b3434a, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -44,7 +44,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 0c1cd1a102d2bc64eb72d600aa780d64, type: 3}
+        m_Texture: {fileID: 2800000, guid: 3e97d662756b73b4ea48d7fe2d65716c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -63,7 +63,7 @@ Material:
     m_Floats:
     - _AnimDistance: 10
     - _BendStrength: 3
-    - _BottomY: -0.21
+    - _BottomY: -0.15
     - _BumpScale: 1
     - _CollisionRadius: 1
     - _Cutoff: 0.7
@@ -81,15 +81,15 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _SwayAmount: 0.225
-    - _SwaySpeed: 1.5
-    - _TopY: 5
+    - _SwayAmount: -0.2
+    - _SwaySpeed: 1
+    - _TopY: 2.5
     - _UVSec: 0
     - _WaterDrag: 0.15
     - _ZWrite: 1
     m_Colors:
-    - _BaseBendDir: {r: 0.5, g: 1, b: 0, a: 0}
-    - _Color: {r: 0.8018868, g: 0.4530198, b: 0.374466, a: 1}
+    - _BaseBendDir: {r: 0.5, g: 0.5, b: 0.5, a: 0}
+    - _Color: {r: 1, g: 0.5518868, b: 0.5518868, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _UnitPosition: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
