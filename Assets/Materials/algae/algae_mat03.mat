@@ -63,9 +63,9 @@ Material:
     m_Floats:
     - _AnimDistance: 10
     - _BendStrength: 3
-    - _BottomY: -0.1
+    - _BottomY: -0.21
     - _BumpScale: 1
-    - _CollisionRadius: 1
+    - _CollisionRadius: 1.5
     - _Cutoff: 0.7
     - _DetailNormalMapScale: 1
     - _DstBlend: 0

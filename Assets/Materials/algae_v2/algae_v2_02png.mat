@@ -7,12 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: algae_mat01
-  m_Shader: {fileID: 4800000, guid: de7192d28e09f1341890d71c35b3434a, type: 3}
+  m_Name: algae_v2_02png
+  m_Shader: {fileID: 4800000, guid: a8f3cbbe20e499849ba366059a281e53, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _ALPHATEST_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -44,7 +45,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 0c1cd1a102d2bc64eb72d600aa780d64, type: 3}
+        m_Texture: {fileID: 2800000, guid: a84d5a91b365beb46805e58413735c45, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -61,36 +62,34 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AnimDistance: 10
-    - _BendStrength: 3
-    - _BottomY: -0.21
+    - _AnimDistance: 40
+    - _BendStrength: 0.5
+    - _BottomY: 0
     - _BumpScale: 1
-    - _CollisionRadius: 1.5
+    - _CollisionRadius: 2
     - _Cutoff: 0.7
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _Elasticity: 1
+    - _Elasticity: 2.5
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
-    - _Mode: 0
+    - _Mode: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PushStrength: 5
+    - _PushStrength: 1.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SwayAmount: 0.2
     - _SwaySpeed: 2
-    - _TopY: 5
+    - _TopY: 2
     - _UVSec: 0
-    - _WaterDrag: 0.15
     - _ZWrite: 1
     m_Colors:
-    - _BaseBendDir: {r: 1, g: 1, b: 0, a: 0}
-    - _Color: {r: 0.48481247, g: 0.4481132, b: 1, a: 1}
+    - _BaseBendDir: {r: 1, g: 0, b: 0, a: 0}
+    - _Color: {r: 0.38416696, g: 0.8177125, b: 0.8396226, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _UnitPosition: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
