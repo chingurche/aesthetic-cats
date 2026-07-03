@@ -8,6 +8,116 @@ public class ObjectSpawner : MonoBehaviour
     [SerializeField]
     private List<SpawnableObject> spawnableObjects = new();
 
+    private readonly Queue<GenerateRequest> generateQueue = new();
+    private bool isGenerating;
+
+    private class GenerateRequest
+    {
+        public MeshData MeshData;
+        public Mesh Mesh;
+        public Transform Parent;
+        public int WorldSeed;
+        public Vector2 ChunkCoord;
+    }
+
+    public void EnqueueGenerate(
+    MeshData meshData,
+    Mesh mesh,
+    Transform parent,
+    int worldSeed,
+    Vector2 chunkCoord)
+    {
+        generateQueue.Enqueue(new GenerateRequest
+        {
+            MeshData = meshData,
+            Mesh = mesh,
+            Parent = parent,
+            WorldSeed = worldSeed,
+            ChunkCoord = chunkCoord
+        });
+
+        if (!isGenerating)
+        {
+            ProcessQueue().Forget();
+        }
+    }
+
+    private async UniTaskVoid ProcessQueue()
+{
+    isGenerating = true;
+
+    while (generateQueue.Count > 0)
+    {
+        GenerateRequest request = generateQueue.Dequeue();
+
+        await Generate(
+            request.MeshData,
+            request.Mesh,
+            request.Parent,
+            request.WorldSeed,
+            request.ChunkCoord);
+
+        await UniTask.Yield();
+    }
+
+    isGenerating = false;
+}
+
+        private void GetRandomPointInCell(
+        MeshData meshData,
+        Mesh mesh,
+        int centerX,
+        int centerY,
+        System.Random random,
+        out Vector3 position,
+        out Vector3 normal)
+    {
+        int width = Mathf.RoundToInt(Mathf.Sqrt(mesh.vertices.Length));
+
+        centerX = Mathf.Clamp(centerX, 0, width - 2);
+        centerY = Mathf.Clamp(centerY, 0, width - 2);
+
+        int v00 = centerY * width + centerX;
+        int v10 = centerY * width + centerX + 1;
+        int v01 = (centerY + 1) * width + centerX;
+        int v11 = (centerY + 1) * width + centerX + 1;
+
+        Vector3 a, b, c;
+        Vector3 na, nb, nc;
+
+        if (random.NextDouble() < 0.5)
+        {
+            a = mesh.vertices[v00];
+            b = mesh.vertices[v10];
+            c = mesh.vertices[v01];
+
+            na = mesh.normals[v00];
+            nb = mesh.normals[v10];
+            nc = mesh.normals[v01];
+        }
+        else
+        {
+            a = mesh.vertices[v10];
+            b = mesh.vertices[v11];
+            c = mesh.vertices[v01];
+
+            na = mesh.normals[v10];
+            nb = mesh.normals[v11];
+            nc = mesh.normals[v01];
+        }
+
+        float u = (float)random.NextDouble();
+        float v = (float)random.NextDouble();
+
+        if (u + v > 1f)
+        {
+            u = 1f - u;
+            v = 1f - v;
+        }
+
+        position = a + (b - a) * u + (c - a) * v;
+        normal = (na + (nb - na) * u + (nc - na) * v).normalized;
+    }
 
     private GameObject GetRandomPrefab(
     SpawnableObject spawnable,
@@ -145,7 +255,7 @@ public class ObjectSpawner : MonoBehaviour
     amount,
     clusterRadius);
 
-        clustersCreated++;
+    clustersCreated++;
         }
     }
 
@@ -170,7 +280,7 @@ public class ObjectSpawner : MonoBehaviour
             amount = spawnable.MaxPerChunk;
         }
 
-        int width = MapGenerator.mapChunkSize;
+        int width = Mathf.RoundToInt(Mathf.Sqrt(mesh.vertices.Length));
 
         int centerX = -1;
         int centerY = -1;
@@ -187,7 +297,9 @@ public class ObjectSpawner : MonoBehaviour
 
         while (spawned < amount && attempts-- > 0)
         {
-            int vertexIndex;
+
+            int x;
+            int y;
 
             if (centerIndex != -1)
             {
@@ -195,7 +307,11 @@ public class ObjectSpawner : MonoBehaviour
                 float angle = (float)random.NextDouble() * Mathf.PI * 2f;
 
                 float t = (float)random.NextDouble();
-                float exponent = Mathf.Lerp(1f, 3f, spawnable.ClusterFalloff);
+
+                float exponent = Mathf.Lerp(
+                    1f,
+                    3f,
+                    spawnable.ClusterFalloff);
 
                 float radius = Mathf.Pow(t, exponent) * clusterRadius;
 
@@ -206,23 +322,29 @@ public class ObjectSpawner : MonoBehaviour
 
                 radius *= noise;
 
-                // Смещение в вершинах
                 int offsetX = Mathf.RoundToInt(Mathf.Cos(angle) * radius);
                 int offsetY = Mathf.RoundToInt(Mathf.Sin(angle) * radius);
 
-                int x = Mathf.Clamp(centerX + offsetX, 0, width - 1);
-                int y = Mathf.Clamp(centerY + offsetY, 0, width - 1);
-
-                vertexIndex = y * width + x;
-                
-                
+                x = Mathf.Clamp(centerX + offsetX, 0, width - 2);
+                y = Mathf.Clamp(centerY + offsetY, 0, width - 2);
             }
             else
             {
-                vertexIndex = random.Next(meshData.vertices.Length);
+                x = random.Next(width - 1);
+                y = random.Next(width - 1);
             }
 
-            Vector3 position = meshData.vertices[vertexIndex];
+            Vector3 position;
+            Vector3 normal;
+
+            GetRandomPointInCell(
+                meshData,
+                mesh,
+                x,
+                y,
+                random,
+                out position,
+                out normal);
 
             // Проверка высоты
             if (position.y < spawnable.MinHeight ||
@@ -232,7 +354,6 @@ public class ObjectSpawner : MonoBehaviour
             }
 
             // Проверка уклона
-            Vector3 normal = mesh.normals[vertexIndex];
             float slope = Vector3.Angle(normal, Vector3.up);
 
             if (slope > spawnable.MaxSlope)

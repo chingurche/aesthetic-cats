@@ -27,7 +27,7 @@ MonoBehaviour:
   MinHeight: -80
   MaxHeight: 5
   MaxSlope: 30
-  SpawnRadius: 0.01
+  SpawnRadius: 0.1
   Scale: {x: 5, y: 5, z: 5}
   MinScaleMultiplier: 1
   MaxScaleMultiplier: 1
