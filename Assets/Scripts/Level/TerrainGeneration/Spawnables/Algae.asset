@@ -22,21 +22,21 @@ MonoBehaviour:
   - Prefab: {fileID: 7735804838428710717, guid: 06ab813c8be40514d8ffadc767d72094, type: 3}
     Weight: 1
     ScaleMultiplierRange: {x: 0.9, y: 1.1}
-  SpawnChance: 0.812
+  SpawnChance: 1
   MaxPerChunk: 20
   MinHeight: -80
   MaxHeight: 5
   MaxSlope: 30
-  SpawnRadius: 1
+  SpawnRadius: 0.01
   Scale: {x: 5, y: 5, z: 5}
   MinScaleMultiplier: 1
   MaxScaleMultiplier: 1
   UseClusters: 1
-  ClusterCount: 3
-  ObjectsPerSquareMeter: 0.3
+  ClusterCount: 5
+  ObjectsPerSquareMeter: 0.2
   MinClusterRadius: 4
   MaxClusterRadius: 8
   MinDistanceBetweenClusters: 15
   ClusterFalloff: 0.5
   ClusterNoise: 0.3
-  AlignToSurface: 1
+  AlignToSurface: 0
