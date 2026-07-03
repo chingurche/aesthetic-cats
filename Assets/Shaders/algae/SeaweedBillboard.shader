@@ -18,6 +18,7 @@ Shader "Custom/SeaweedBillboard"
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_instancing
+            #pragma multi_compile_fog
             #include "UnityCG.cginc"
 
             struct appdata
@@ -30,6 +31,7 @@ Shader "Custom/SeaweedBillboard"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
@@ -62,6 +64,8 @@ Shader "Custom/SeaweedBillboard"
                 o.vertex = mul(UNITY_MATRIX_VP, float4(worldPos, 1.0));
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 
+                UNITY_TRANSFER_FOG(o, o.vertex);
+                
                 return o;
             }
 
@@ -72,6 +76,8 @@ Shader "Custom/SeaweedBillboard"
                 fixed4 col = tex2D(_MainTex, i.uv) * _Color;
                 
                 clip(col.a - _Cutoff);
+                
+                UNITY_APPLY_FOG(i.fogCoord, col);
                 
                 return col;
             }
