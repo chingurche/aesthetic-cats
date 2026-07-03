@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e38636f6038dda4c9e58ac06c73f256, type: 3}
+  m_Name: Algae
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnableObject
+  Prefabs:
+  - Prefab: {fileID: 9031753232790360808, guid: cde8ce8580db3f240820db30c6bd084e, type: 3}
+    Weight: 1
+    ScaleMultiplierRange: {x: 0.9, y: 1.1}
+  - Prefab: {fileID: 6559257757823795284, guid: c925794adc5ab264794901b705884559, type: 3}
+    Weight: 1
+    ScaleMultiplierRange: {x: 0.9, y: 1.1}
+  - Prefab: {fileID: 7735804838428710717, guid: 06ab813c8be40514d8ffadc767d72094, type: 3}
+    Weight: 1
+    ScaleMultiplierRange: {x: 0.9, y: 1.1}
+  SpawnChance: 1
+  MaxPerChunk: 20
+  MinHeight: -80
+  MaxHeight: 5
+  MaxSlope: 30
+  SpawnRadius: 0.01
+  Scale: {x: 5, y: 5, z: 5}
+  MinScaleMultiplier: 1
+  MaxScaleMultiplier: 1
+  UseClusters: 1
+  ClusterCount: 5
+  ObjectsPerSquareMeter: 0.2
+  MinClusterRadius: 4
+  MaxClusterRadius: 8
+  MinDistanceBetweenClusters: 15
+  ClusterFalloff: 0.5
+  ClusterNoise: 0.3
+  AlignToSurface: 0
