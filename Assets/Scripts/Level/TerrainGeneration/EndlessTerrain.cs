@@ -69,7 +69,7 @@ public class EndlessTerrain : MonoBehaviour
         isCreatingChunks = false;
     }
 
-    public void Update()
+    public void FixedUpdate()
     {
         viewerPosition = new Vector2(viewer.position.x, viewer.position.z);
         UpdateVisibleChunks();
@@ -130,6 +130,7 @@ public class EndlessTerrain : MonoBehaviour
         MeshCollider meshCollider;
         private readonly ObjectSpawner objectSpawner;
         private readonly Vector2 coord;
+        private bool visible;
 
         public TerrainChunk(Vector2 coord, int size, Transform parent, Material material, ObjectSpawner objectSpawner)
         {
@@ -183,12 +184,14 @@ public class EndlessTerrain : MonoBehaviour
 
         public void SetVisible(bool visible)
         {
-            meshObject.SetActive(visible);
+            meshRenderer.enabled = visible;
+            meshCollider.enabled = visible;
+            this.visible = visible;
         }
 
         public bool IsVisible()
         {
-            return meshObject.activeSelf;
+            return visible;
         }
     }
 }
