@@ -26,6 +26,7 @@ public class MapGenerator : MonoBehaviour
     public Vector2 slopeDirection = new Vector2(1, 0); // Направление склона
     public float slopeIntensity = 2f;
 
+	public int Seed => seed;
 
     [Header("Update")]
 	public bool autoUpdate;
