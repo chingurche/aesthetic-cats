@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e38636f6038dda4c9e58ac06c73f256, type: 3}
+  m_Name: TallSeaweed_Green
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnableObject
+  Prefabs:
+  - Prefab: {fileID: 7735804838428710717, guid: 06ab813c8be40514d8ffadc767d72094, type: 3}
+    Weight: 6
+    ScaleMultiplierRange: {x: 0, y: 0}
+  - Prefab: {fileID: 9031753232790360808, guid: cde8ce8580db3f240820db30c6bd084e, type: 3}
+    Weight: 2
+    ScaleMultiplierRange: {x: 0, y: 0}
+  - Prefab: {fileID: 6559257757823795284, guid: c925794adc5ab264794901b705884559, type: 3}
+    Weight: 1
+    ScaleMultiplierRange: {x: 0, y: 0}
+  SpawnChance: 0.9
+  MaxPerChunk: 0
+  MinHeight: -30
+  MaxHeight: -15
+  MaxSlope: 30
+  SpawnRadius: 0.4
+  DensityRadius: 0.6
+  Scale: {x: 4.8, y: 4.8, z: 4.8}
+  MinScaleMultiplier: 0.85
+  MaxScaleMultiplier: 1.25
+  UseClusters: 1
+  ClusterCount: 5
+  ObjectsPerSquareMeter: 0.1
+  MinClusterRadius: 20
+  MaxClusterRadius: 30
+  MinDistanceBetweenClusters: 15
+  MinDistanceToOtherClusters: 15
+  ClusterFalloff: 0.2
+  ClusterNoise: 0.8
+  AlignToSurface: 0

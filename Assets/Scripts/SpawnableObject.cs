@@ -31,6 +31,11 @@ public class SpawnableObject : ScriptableObject
 
     [Tooltip("Minimum spacing radius around this object. Prevents objects from overlapping.")]
     public float SpawnRadius = 1f;
+    
+    [Header("Density")]
+
+    [Tooltip("Approximate radius used for calculating cluster density.")]
+    public float DensityRadius = 0.6f;
 
     [Header("Scale")]
 
@@ -69,6 +74,9 @@ public class SpawnableObject : ScriptableObject
     [Tooltip("Minimum distance allowed between cluster centers.")]
     [Min(0)]
     public float MinDistanceBetweenClusters = 15f;
+    [Tooltip("Minimum distance from clusters of other spawnable objects.")]
+    [Min(0)]
+    public float MinDistanceToOtherClusters = 15f;
 
     [Header("Cluster Shape")]
 

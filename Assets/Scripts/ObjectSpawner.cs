@@ -10,7 +10,13 @@ public class ObjectSpawner : MonoBehaviour
 
     private readonly Queue<GenerateRequest> generateQueue = new();
     private bool isGenerating;
+    List<ClusterCenter> allClusterCenters = new();
 
+    public class ClusterCenter
+    {
+        public Vector3 Position;
+        public SpawnableObject Spawnable;
+    }
     private class GenerateRequest
     {
         public MeshData MeshData;
@@ -166,6 +172,8 @@ public class ObjectSpawner : MonoBehaviour
     Vector2 chunkCoord)
     {
   
+    allClusterCenters.Clear();
+    
     List<SpawnedObject> spawnedObjects = new();
 
     int chunkSeed =
@@ -191,7 +199,6 @@ public class ObjectSpawner : MonoBehaviour
             continue;
         }
 
-    List<Vector3> clusterCenters = new();
     int clustersCreated = 0;
     int clusterAttempts = spawnable.ClusterCount * 10;
 
@@ -217,10 +224,16 @@ public class ObjectSpawner : MonoBehaviour
 
         bool validCenter = true;
 
-        foreach (Vector3 existingCenter in clusterCenters)
+        foreach (ClusterCenter other in allClusterCenters)
         {
-            if ((center - existingCenter).sqrMagnitude < spawnable.MinDistanceBetweenClusters *
-                spawnable.MinDistanceBetweenClusters)
+            float minDistance =
+            other.Spawnable == spawnable
+                ? spawnable.MinDistanceBetweenClusters
+                : Mathf.Max(
+                    spawnable.MinDistanceToOtherClusters,
+                    other.Spawnable.MinDistanceToOtherClusters);
+
+            if ((center - other.Position).sqrMagnitude < minDistance * minDistance)
             {
                 validCenter = false;
                 break;
@@ -230,9 +243,12 @@ public class ObjectSpawner : MonoBehaviour
         if (!validCenter)
             continue;
 
-        clusterCenters.Add(center);
+        allClusterCenters.Add(new ClusterCenter
+        {
+            Position = center,
+            Spawnable = spawnable
+        });
 
-        
     float clusterRadius = Mathf.Lerp(
     spawnable.MinClusterRadius,
     spawnable.MaxClusterRadius,
@@ -240,9 +256,13 @@ public class ObjectSpawner : MonoBehaviour
 
     float area = Mathf.PI * clusterRadius * clusterRadius;
 
-    int amount = Mathf.Max(
-        1,
-        Mathf.RoundToInt(area * spawnable.ObjectsPerSquareMeter));
+    int desiredAmount = Mathf.Max(1, Mathf.RoundToInt(area * spawnable.ObjectsPerSquareMeter));
+
+    float minAreaPerObject = Mathf.PI * spawnable.DensityRadius * spawnable.DensityRadius;
+
+    int maxAmount = Mathf.Max(1, Mathf.RoundToInt(area / minAreaPerObject * 0.6f));
+
+    int amount = Mathf.Min(desiredAmount, maxAmount);
 
     await Spawn(
     spawnable,
@@ -258,6 +278,7 @@ public class ObjectSpawner : MonoBehaviour
     clustersCreated++;
         }
     }
+    
 
 }
    private async UniTask Spawn(
@@ -292,7 +313,8 @@ public class ObjectSpawner : MonoBehaviour
         }
 
         int spawned = 0;
-        int attempts = amount * 10;
+        int attempts = Mathf.Min(Mathf.RoundToInt(clusterRadius * clusterRadius * 2f), 700);
+
 
 
         while (spawned < amount && attempts-- > 0)
@@ -363,6 +385,12 @@ public class ObjectSpawner : MonoBehaviour
 
         bool canSpawn = true;
 
+        // Проверка шанса появления
+        if (random.NextDouble() > spawnable.SpawnChance)
+        {
+            continue;
+        }
+
         foreach (SpawnedObject other in spawnedObjects)
         {
             float minDistance =
@@ -380,11 +408,6 @@ public class ObjectSpawner : MonoBehaviour
         if (!canSpawn)
             continue;
 
-            // Проверка шанса появления
-            if (random.NextDouble() > spawnable.SpawnChance)
-            {
-                continue;
-            }
 
             GameObject prefab = GetRandomPrefab(spawnable, random);
     

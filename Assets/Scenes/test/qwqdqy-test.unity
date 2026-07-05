@@ -212,7 +212,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &88089834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -589,6 +589,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectSpawner
   spawnableObjects:
   - {fileID: 11400000, guid: 784f3b3cc7fb4ef4cbb2879935166f2e, type: 2}
+  - {fileID: 11400000, guid: 8b1a11ea782633d41afadd837c5edb0f, type: 2}
+  - {fileID: 11400000, guid: 9502841436bdfc74889bc423ab7f1ebe, type: 2}
+  - {fileID: 11400000, guid: c68c38e7140fa7f4890eda8c9501edc7, type: 2}
 --- !u!1 &273536572
 GameObject:
   m_ObjectHideFlags: 0
