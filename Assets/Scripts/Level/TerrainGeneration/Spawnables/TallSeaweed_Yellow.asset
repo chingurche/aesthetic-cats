@@ -28,17 +28,16 @@ MonoBehaviour:
   MaxHeight: -2
   MaxSlope: 30
   SpawnRadius: 0.4
-  DensityRadius: 0.6
   Scale: {x: 4.8, y: 4.8, z: 4.8}
   MinScaleMultiplier: 0.85
   MaxScaleMultiplier: 1.25
   UseClusters: 1
-  ClusterCount: 5
-  ObjectsPerSquareMeter: 0.1
+  ClusterCount: 8
   MinClusterRadius: 20
   MaxClusterRadius: 30
   MinDistanceBetweenClusters: 15
   MinDistanceToOtherClusters: 15
+  ObjectSpacing: 0.4
   ClusterFalloff: 0.2
   ClusterNoise: 0.8
   AlignToSurface: 0

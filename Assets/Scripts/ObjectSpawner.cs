@@ -205,7 +205,14 @@ public class ObjectSpawner : MonoBehaviour
     while (clustersCreated < spawnable.ClusterCount &&
         clusterAttempts-- > 0)
     {
-        int centerIndex = random.Next(meshData.vertices.Length);
+        int width = Mathf.RoundToInt(Mathf.Sqrt(mesh.vertices.Length));
+
+        int border = Mathf.CeilToInt(spawnable.MaxClusterRadius);
+
+        int centerX = random.Next(border, width - border);
+        int centerY = random.Next(border, width - border);
+
+        int centerIndex = centerY * width + centerX;
 
         Vector3 center = meshData.vertices[centerIndex];
 
@@ -254,15 +261,13 @@ public class ObjectSpawner : MonoBehaviour
     spawnable.MaxClusterRadius,
     (float)random.NextDouble());
 
+    const float packing = 0.55f;
+
     float area = Mathf.PI * clusterRadius * clusterRadius;
 
-    int desiredAmount = Mathf.Max(1, Mathf.RoundToInt(area * spawnable.ObjectsPerSquareMeter));
+    float objectArea = Mathf.PI * spawnable.ObjectSpacing * spawnable.ObjectSpacing;
 
-    float minAreaPerObject = Mathf.PI * spawnable.DensityRadius * spawnable.DensityRadius;
-
-    int maxAmount = Mathf.Max(1, Mathf.RoundToInt(area / minAreaPerObject * 0.6f));
-
-    int amount = Mathf.Min(desiredAmount, maxAmount);
+    int amount = Mathf.Max(1, Mathf.CeilToInt(area / objectArea * packing));
 
     await Spawn(
     spawnable,
@@ -347,8 +352,14 @@ public class ObjectSpawner : MonoBehaviour
                 int offsetX = Mathf.RoundToInt(Mathf.Cos(angle) * radius);
                 int offsetY = Mathf.RoundToInt(Mathf.Sin(angle) * radius);
 
-                x = Mathf.Clamp(centerX + offsetX, 0, width - 2);
-                y = Mathf.Clamp(centerY + offsetY, 0, width - 2);
+                x = centerX + offsetX;
+                y = centerY + offsetY;
+
+                if (x < 0 || x >= width - 1 ||
+                    y < 0 || y >= width - 1)
+                {
+                    continue;
+                }
             }
             else
             {
