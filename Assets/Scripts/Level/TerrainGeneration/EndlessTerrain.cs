@@ -3,14 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Diagnostics;
+using VContainer;
+
 public class EndlessTerrain : MonoBehaviour
 {
     public const float maxViewDst = 300;
-    public Transform viewer;
+    private Transform viewer;
+
     public Material mapMaterial;
 
     public static Vector2 viewerPosition;
-    static MapGenerator mapGenerator;
     private int chunkSize;
     int chunkVisibleInViewDst;
     
@@ -21,15 +23,27 @@ public class EndlessTerrain : MonoBehaviour
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
     List<TerrainChunk> terrainChunksVisibleLastUpdate = new List<TerrainChunk>();
 
+    private MapGenerator mapGenerator;
     private ObjectSpawner objectSpawner;
 
-    private void Start()
+    private bool isInitialized = false;
+
+    public void Initialize()
     {
         mapGenerator = GetComponent<MapGenerator>();
         objectSpawner = GetComponent<ObjectSpawner>();
-      
+
+        viewer = GameObject.FindGameObjectWithTag("Player").transform;
+
         chunkSize = MapGenerator.mapChunkSize - 1;
         chunkVisibleInViewDst = Mathf.RoundToInt(maxViewDst / chunkSize);
+
+        isInitialized = true;
+    }
+
+    public void SetViewer(Transform playerTransform)
+    {
+        viewer = playerTransform;
     }
 
     private async UniTask CreateQueuedChunks()
@@ -57,7 +71,8 @@ public class EndlessTerrain : MonoBehaviour
                     chunkSize,
                     transform,
                     mapMaterial,
-                    objectSpawner);
+                    objectSpawner,
+                    mapGenerator);
 
             if (stopwatch.ElapsedTicks >= frameBudgetTicks)
             {
@@ -71,6 +86,8 @@ public class EndlessTerrain : MonoBehaviour
 
     public void FixedUpdate()
     {
+        if (!isInitialized) return;
+
         viewerPosition = new Vector2(viewer.position.x, viewer.position.z);
         UpdateVisibleChunks();
 
@@ -128,12 +145,20 @@ public class EndlessTerrain : MonoBehaviour
         MeshRenderer meshRenderer;
         MeshFilter meshFilter;
         MeshCollider meshCollider;
+        private readonly MapGenerator mapGenerator;
         private readonly ObjectSpawner objectSpawner;
         private readonly Vector2 coord;
         private bool visible;
 
-        public TerrainChunk(Vector2 coord, int size, Transform parent, Material material, ObjectSpawner objectSpawner)
+        public TerrainChunk(
+            Vector2 coord, 
+            int size, 
+            Transform parent, 
+            Material material, 
+            ObjectSpawner objectSpawner,
+            MapGenerator mapGenerator)
         {
+            this.mapGenerator = mapGenerator;
             this.objectSpawner = objectSpawner;
             this.coord = coord;
             position = coord * size;

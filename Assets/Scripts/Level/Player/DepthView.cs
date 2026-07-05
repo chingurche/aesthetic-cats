@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public class DepthEffects : MonoBehaviour
+public class DepthView : MonoBehaviour
 {
-    [SerializeField] public DepthCounter depthCounter;
     [SerializeField] public Camera rCamera;
     [SerializeField] public float maxDepthEffect;
     [SerializeField] public float minDepthAmbientIntensity;
@@ -10,6 +9,15 @@ public class DepthEffects : MonoBehaviour
     [SerializeField] public Color minDepthColor;
     [SerializeField] public Color maxDepthColor;
 
+
+    private PlayerModel model;
+
+    public void Initialize(PlayerModel model)
+    {
+        this.model = model;
+
+        model.OnDepthChanged += SetDepthEffects;
+    }
 
     private void SetDepthEffects(float depth)
     {
@@ -21,13 +29,8 @@ public class DepthEffects : MonoBehaviour
         rCamera.backgroundColor = c;
     }
 
-    private void OnEnable()
+    private void OnDestroy()
     {
-        depthCounter.OnDepthChanged.AddListener(SetDepthEffects);
-    }
-
-    private void OnDisable()
-    {
-        depthCounter.OnDepthChanged.RemoveListener(SetDepthEffects);
+        model.OnDepthChanged -= SetDepthEffects;
     }
 }
