@@ -7,10 +7,88 @@ public class ObjectSpawner : MonoBehaviour
 {
     [SerializeField]
     private List<SpawnableObject> spawnableObjects = new();
-
+    
+    private ObjectPool pool;
     private readonly Queue<GenerateRequest> generateQueue = new();
     private bool isGenerating;
     List<ClusterCenter> allClusterCenters = new();
+
+    private readonly Dictionary<Vector2Int, List<SpawnedObject>> spatialGrid = new();
+
+    private const float CellSize = 3f;
+
+    private class ChunkObjects
+    {
+        public readonly List<GameObject> Objects = new();
+    }
+
+    private Vector2Int GetCell(Vector3 position)
+    {
+        return new Vector2Int(
+            Mathf.FloorToInt(position.x / CellSize),
+            Mathf.FloorToInt(position.z / CellSize));
+    }
+
+    private void AddObject(SpawnedObject obj)
+    {
+        Vector2Int cell = GetCell(obj.Position);
+
+        if (!spatialGrid.TryGetValue(cell, out var list))
+        {
+            list = new List<SpawnedObject>();
+            spatialGrid[cell] = list;
+        }
+
+        list.Add(obj);
+    }
+
+    private bool CanSpawn(Vector3 position, float radius)
+    {
+        Vector2Int cell = GetCell(position);
+
+        for (int y = -1; y <= 1; y++)
+        {
+            for (int x = -1; x <= 1; x++)
+            {
+                Vector2Int neighbour = new(cell.x + x, cell.y + y);
+
+                if (!spatialGrid.TryGetValue(neighbour, out var objects))
+                    continue;
+
+                foreach (SpawnedObject other in objects)
+                {
+                    float minDistance = radius + other.Radius;
+
+                    if ((position - other.Position).sqrMagnitude <
+                        minDistance * minDistance)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private void Awake()
+    {
+        pool = GetComponent<ObjectPool>();
+    }
+    private readonly Dictionary<Transform, ChunkObjects> chunkObjects = new();
+
+    public void ReleaseChunkObjects(Transform parent)
+    {
+        if (!chunkObjects.TryGetValue(parent, out ChunkObjects chunk))
+            return;
+
+        foreach (GameObject obj in chunk.Objects)
+        {
+            pool.Release(obj);
+        }
+
+        chunk.Objects.Clear();
+    }
 
     public class ClusterCenter
     {
@@ -48,37 +126,44 @@ public class ObjectSpawner : MonoBehaviour
         }
     }
 
-    private async UniTaskVoid ProcessQueue()
-{
-    isGenerating = true;
-
-    while (generateQueue.Count > 0)
+   private async UniTaskVoid ProcessQueue()
     {
-        GenerateRequest request = generateQueue.Dequeue();
+        isGenerating = true;
 
-        await Generate(
-            request.MeshData,
-            request.Mesh,
-            request.Parent,
-            request.WorldSeed,
-            request.ChunkCoord);
+        float frameStart = Time.realtimeSinceStartup;
+        const float frameBudget = 0.004f; // 4 мс
 
-        await UniTask.Yield();
+        while (generateQueue.Count > 0)
+        {
+            GenerateRequest request = generateQueue.Dequeue();
+
+            await Generate(
+                request.MeshData,
+                request.Mesh,
+                request.Parent,
+                request.WorldSeed,
+                request.ChunkCoord);
+
+            if (Time.realtimeSinceStartup - frameStart > frameBudget)
+            {
+                frameStart = Time.realtimeSinceStartup;
+                await UniTask.Yield();
+            }
+        }
+
+        isGenerating = false;
     }
 
-    isGenerating = false;
-}
-
         private void GetRandomPointInCell(
-        MeshData meshData,
-        Mesh mesh,
-        int centerX,
-        int centerY,
-        System.Random random,
-        out Vector3 position,
-        out Vector3 normal)
+            Vector3[] vertices,
+            Vector3[] normals,
+            int width,
+            int centerX,
+            int centerY,
+            System.Random random,
+            out Vector3 position,
+            out Vector3 normal)
     {
-        int width = Mathf.RoundToInt(Mathf.Sqrt(mesh.vertices.Length));
 
         centerX = Mathf.Clamp(centerX, 0, width - 2);
         centerY = Mathf.Clamp(centerY, 0, width - 2);
@@ -93,23 +178,23 @@ public class ObjectSpawner : MonoBehaviour
 
         if (random.NextDouble() < 0.5)
         {
-            a = mesh.vertices[v00];
-            b = mesh.vertices[v10];
-            c = mesh.vertices[v01];
+            a = vertices[v00];
+            b = vertices[v10];
+            c = vertices[v01];
 
-            na = mesh.normals[v00];
-            nb = mesh.normals[v10];
-            nc = mesh.normals[v01];
+            na = normals[v00];
+            nb = normals[v10];
+            nc = normals[v01];
         }
         else
         {
-            a = mesh.vertices[v10];
-            b = mesh.vertices[v11];
-            c = mesh.vertices[v01];
+            a = vertices[v10];
+            b = vertices[v11];
+            c = vertices[v01];
 
-            na = mesh.normals[v10];
-            nb = mesh.normals[v11];
-            nc = mesh.normals[v01];
+            na = normals[v10];
+            nb = normals[v11];
+            nc = normals[v01];
         }
 
         float u = (float)random.NextDouble();
@@ -151,7 +236,7 @@ public class ObjectSpawner : MonoBehaviour
         return spawnable.Prefabs[0].Prefab;
     }
 
-    public class SpawnedObject
+    public struct SpawnedObject
     {
         public Vector3 Position;
         public float Radius;
@@ -171,10 +256,28 @@ public class ObjectSpawner : MonoBehaviour
     int worldSeed,
     Vector2 chunkCoord)
     {
-  
+
+    Vector3[] vertices = mesh.vertices;
+    Vector3[] normals = mesh.normals;
+
+    int width = Mathf.RoundToInt(Mathf.Sqrt(vertices.Length));
+
+    if (!chunkObjects.TryGetValue(parent, out ChunkObjects chunk))
+    {
+        chunk = new ChunkObjects();
+        chunkObjects[parent] = chunk;
+    }
+
+    foreach (GameObject obj in chunk.Objects)
+    {
+        pool.Release(obj);
+    }
+
+    chunk.Objects.Clear();
+
     allClusterCenters.Clear();
-    
-    List<SpawnedObject> spawnedObjects = new();
+
+    spatialGrid.Clear();
 
     int chunkSeed =
         worldSeed ^
@@ -191,10 +294,13 @@ public class ObjectSpawner : MonoBehaviour
             await Spawn(
                 spawnable,
                 meshData,
-                mesh,
+                vertices,
+                normals,
+                width,
                 parent,
-                random,
-                spawnedObjects);
+                chunk,
+                random
+                );
 
             continue;
         }
@@ -205,8 +311,6 @@ public class ObjectSpawner : MonoBehaviour
     while (clustersCreated < spawnable.ClusterCount &&
         clusterAttempts-- > 0)
     {
-        int width = Mathf.RoundToInt(Mathf.Sqrt(mesh.vertices.Length));
-
         int border = Mathf.CeilToInt(spawnable.MaxClusterRadius);
 
         int centerX = random.Next(border, width - border);
@@ -222,7 +326,7 @@ public class ObjectSpawner : MonoBehaviour
             continue;
         }
 
-        Vector3 centerNormal = mesh.normals[centerIndex];
+        Vector3 centerNormal = normals[centerIndex];
 
         if (Vector3.Angle(centerNormal, Vector3.up) > spawnable.MaxSlope)
         {
@@ -272,10 +376,12 @@ public class ObjectSpawner : MonoBehaviour
     await Spawn(
     spawnable,
     meshData,
-    mesh,
+    vertices,
+    normals,
+    width,
     parent,
+    chunk,
     random,
-    spawnedObjects,
     centerIndex,
     amount,
     clusterRadius);
@@ -283,16 +389,18 @@ public class ObjectSpawner : MonoBehaviour
     clustersCreated++;
         }
     }
-    
+   
 
 }
-   private async UniTask Spawn(
+  private async UniTask Spawn(
     SpawnableObject spawnable,
     MeshData meshData,
-    Mesh mesh,
+    Vector3[] vertices,
+    Vector3[] normals,
+    int width,
     Transform parent,
+    ChunkObjects chunk,
     System.Random random,
-    List<SpawnedObject> spawnedObjects,
     int centerIndex = -1,
     int amount = -1,
     float clusterRadius = 0)
@@ -305,8 +413,6 @@ public class ObjectSpawner : MonoBehaviour
         {
             amount = spawnable.MaxPerChunk;
         }
-
-        int width = Mathf.RoundToInt(Mathf.Sqrt(mesh.vertices.Length));
 
         int centerX = -1;
         int centerY = -1;
@@ -370,15 +476,15 @@ public class ObjectSpawner : MonoBehaviour
             Vector3 position;
             Vector3 normal;
 
-            GetRandomPointInCell(
-                meshData,
-                mesh,
+           GetRandomPointInCell(
+                vertices,
+                normals,
+                width,
                 x,
                 y,
                 random,
                 out position,
                 out normal);
-
             // Проверка высоты
             if (position.y < spawnable.MinHeight ||
                 position.y > spawnable.MaxHeight)
@@ -394,40 +500,27 @@ public class ObjectSpawner : MonoBehaviour
                 continue;
             }
 
-        bool canSpawn = true;
+       
 
-        // Проверка шанса появления
-        if (random.NextDouble() > spawnable.SpawnChance)
-        {
-            continue;
-        }
-
-        foreach (SpawnedObject other in spawnedObjects)
-        {
-            float minDistance =
-                spawnable.SpawnRadius +
-                other.Radius;
-
-            if ((position - other.Position).sqrMagnitude <
-                minDistance * minDistance)
+            // Проверка шанса появления
+            if (random.NextDouble() > spawnable.SpawnChance)
             {
-                canSpawn = false;
-                break;
+                continue;
             }
-        }
-    
-        if (!canSpawn)
-            continue;
 
+            if (!CanSpawn(position, spawnable.SpawnRadius))
+            continue;
 
             GameObject prefab = GetRandomPrefab(spawnable, random);
     
-            GameObject obj = Instantiate(prefab, parent);
+            GameObject obj = pool.Get(prefab, parent);
+            chunk.Objects.Add(obj);
 
-            spawnedObjects.Add(
-            new SpawnedObject(
-                position,
-                spawnable.SpawnRadius));
+            SpawnedObject spawnedObject = new SpawnedObject(
+            position,
+            spawnable.SpawnRadius);
+
+            AddObject(spawnedObject);
 
 
             obj.transform.localPosition = position;
@@ -447,15 +540,11 @@ public class ObjectSpawner : MonoBehaviour
 
                 obj.transform.Rotate(
                     Vector3.up,
-                    (float)random.NextDouble() * 360f,
-                    Space.Self);
+                    (float)random.NextDouble() * 360f, Space.Self);
             }
             else
             {
-                obj.transform.Rotate(
-                    0f,
-                    (float)random.NextDouble() * 360f,
-                    0f);
+                obj.transform.Rotate(0f, (float)random.NextDouble() * 360f, 0f);
             }
 
             spawned++;

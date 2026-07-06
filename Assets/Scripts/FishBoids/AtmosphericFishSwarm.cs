@@ -63,8 +63,17 @@ public class AtmosphericFishSwarm : MonoBehaviour
     private bool isCurrentlyScared = false;
     private float currentFleeTime = 0f;
 
-    void Start()
+    public void ResetSwarm()
     {
+        isCurrentlyScared = false;
+        currentFleeTime = 0f;
+    }
+    public void Initialize(int count)
+    {
+        isCurrentlyScared = false;
+        currentFleeTime = 0f;
+        fishCount = count;
+
         matrices = new Matrix4x4[fishCount];
         positions = new Vector3[fishCount];
         velocities = new Vector3[fishCount];
@@ -115,7 +124,7 @@ public class AtmosphericFishSwarm : MonoBehaviour
             {
                 if (!returnIfNotScared)
                 {
-                    Destroy(gameObject);
+                    gameObject.SetActive(false);
                     return;
                 }
                 else
