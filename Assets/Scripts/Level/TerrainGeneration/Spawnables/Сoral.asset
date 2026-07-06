@@ -16,12 +16,6 @@ MonoBehaviour:
   - Prefab: {fileID: 3511101244517173668, guid: 3c16c37baa1e0cd4c8db5dd4cf73f779, type: 3}
     Weight: 0
     ScaleMultiplierRange: {x: 0, y: 0}
-  - Prefab: {fileID: 5757961914865927876, guid: dfb13b6b3bf79e04f9727760349a75b3, type: 3}
-    Weight: 0
-    ScaleMultiplierRange: {x: 0, y: 0}
-  - Prefab: {fileID: 6643949074631921769, guid: e6b0e700081944846b2add61a47717b6, type: 3}
-    Weight: 0
-    ScaleMultiplierRange: {x: 0, y: 0}
   SpawnChance: 1
   MaxPerChunk: 20
   MinHeight: -10
