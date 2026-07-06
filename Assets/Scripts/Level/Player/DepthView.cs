@@ -17,6 +17,15 @@ public class DepthView : MonoBehaviour
         this.model = model;
 
         model.OnDepthChanged += SetDepthEffects;
+
+        InitializeEnvironment();
+    }
+
+    private void InitializeEnvironment() // потом перенести в какойнибудь более глобальный класс
+    {
+        RenderSettings.fog = true;
+        RenderSettings.fogMode = FogMode.ExponentialSquared;
+        RenderSettings.fogDensity = 0.1f;
     }
 
     private void SetDepthEffects(float depth)
