@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6808044589436447673
 Transform:
   m_ObjectHideFlags: 0
@@ -143,14 +143,10 @@ LODGroup:
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 6541147896139655167}
-  - screenRelativeHeight: 0.3
+  - screenRelativeHeight: 0.08
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 3168577182178581275}
-  - screenRelativeHeight: 0.07
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 3717500174649196446}
   m_Enabled: 1
 --- !u!1001 &4339387055089584031
 PrefabInstance:
