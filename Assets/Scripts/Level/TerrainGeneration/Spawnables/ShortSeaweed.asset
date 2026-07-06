@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e38636f6038dda4c9e58ac06c73f256, type: 3}
+  m_Name: ShortSeaweed
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnableObject
+  Prefabs:
+  - Prefab: {fileID: 6714520359206684648, guid: 6ac388aa35af9d9488ac41c79cadcb0a, type: 3}
+    Weight: 4
+    ScaleMultiplierRange: {x: 0, y: 0}
+  - Prefab: {fileID: 1402683428342245822, guid: feef5551f5d853b4f819b8cee5db4582, type: 3}
+    Weight: 2
+    ScaleMultiplierRange: {x: 0, y: 0}
+  SpawnChance: 1
+  MaxPerChunk: 10
+  MinHeight: -20
+  MaxHeight: 5
+  MaxSlope: 30
+  SpawnRadius: 0.3
+  DensityRadius: 0.6
+  Scale: {x: 3.8, y: 3.8, z: 3.8}
+  MinScaleMultiplier: 0.8
+  MaxScaleMultiplier: 1.35
+  UseClusters: 1
+  ClusterCount: 5
+  ObjectsPerSquareMeter: 0.1
+  MinClusterRadius: 4
+  MaxClusterRadius: 8
+  MinDistanceBetweenClusters: 15
+  MinDistanceToOtherClusters: 17
+  ClusterFalloff: 0.45
+  ClusterNoise: 0.6
+  AlignToSurface: 0

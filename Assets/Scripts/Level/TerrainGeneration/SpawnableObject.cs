@@ -54,10 +54,6 @@ public class SpawnableObject : ScriptableObject
     [Min(1)]
     public int ClusterCount = 3;
 
-    [Tooltip("Average number of objects per square meter inside a cluster.")]
-    [Min(0.1f)]
-    public float ObjectsPerSquareMeter = 0.3f;
-
     [Tooltip("Minimum radius of a generated cluster.")]
     [Min(0)]
     public float MinClusterRadius = 4f;
@@ -69,6 +65,15 @@ public class SpawnableObject : ScriptableObject
     [Tooltip("Minimum distance allowed between cluster centers.")]
     [Min(0)]
     public float MinDistanceBetweenClusters = 15f;
+    [Tooltip("Minimum distance from clusters of other spawnable objects.")]
+    [Min(0)]
+    public float MinDistanceToOtherClusters = 15f;
+
+    [Header("Density")]
+
+    [Tooltip("Desired spacing between nearby objects. Larger values produce fewer objects in a cluster.")]
+    [Min(0.1f)]
+    public float ObjectSpacing  = 0.6f;
 
     [Header("Cluster Shape")]
 
