@@ -3778,7 +3778,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd7474930211cd5478e9160f77936848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DepthCounterText
-  depthCounter: {fileID: 1721971258}
   text: {fileID: 1052998747}
 --- !u!114 &1052998747
 MonoBehaviour:
@@ -5387,7 +5386,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12edeeef6696f4944b3e48576142c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EndlessTerrain
-  viewer: {fileID: 710374273}
   mapMaterial: {fileID: 2100000, guid: 568925b0cb17da1458efbc5675906a43, type: 2}
 --- !u!114 &1721971261
 MonoBehaviour:

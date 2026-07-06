@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e38636f6038dda4c9e58ac06c73f256, type: 3}
+  m_Name: "\u0421oral"
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnableObject
+  Prefabs:
+  - Prefab: {fileID: 3511101244517173668, guid: 3c16c37baa1e0cd4c8db5dd4cf73f779, type: 3}
+    Weight: 0
+    ScaleMultiplierRange: {x: 0, y: 0}
+  SpawnChance: 1
+  MaxPerChunk: 20
+  MinHeight: -10
+  MaxHeight: 10
+  MaxSlope: 30
+  SpawnRadius: 0.3
+  Scale: {x: 2, y: 2, z: 2}
+  MinScaleMultiplier: 0.8
+  MaxScaleMultiplier: 1.25
+  UseClusters: 1
+  ClusterCount: 8
+  MinClusterRadius: 10
+  MaxClusterRadius: 12
+  MinDistanceBetweenClusters: 15
+  MinDistanceToOtherClusters: 15
+  ObjectSpacing: 1
+  ClusterFalloff: 0.56
+  ClusterNoise: 0.29
+  AlignToSurface: 1

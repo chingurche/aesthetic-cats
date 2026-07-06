@@ -22,6 +22,9 @@ public class PlayerView : MonoBehaviour
     
     private void OnDestroy()
     {
-        model.OnDepthChanged -= UpdateDepthUI;
+        if (model != null)
+        {
+            model.OnDepthChanged -= UpdateDepthUI;
+        }
     }
 }
