@@ -32,5 +32,9 @@ public class TestBootstrap : MonoBehaviour
         {
             Debug.LogError("EndlessTerrain not found.");
         }
+        
+        ObjectSpawner objectSpawner = FindAnyObjectByType<ObjectSpawner>();
+        if (objectSpawner != null)
+            objectSpawner.Initialize();
     }
 }

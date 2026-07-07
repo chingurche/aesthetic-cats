@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 using System.Diagnostics;
 
-public class LevelManager : MonoBehaviour, ISceneManager
+public class LevelManager : BaseSceneManager
 {
     [Inject] private IObjectResolver resolver; 
     [SerializeField] private string mapAddress;
@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour, ISceneManager
     private EndlessTerrain terrain;
     private GameObject playerInstance;
 
-    public async UniTask Initialize()
+    public override async UniTask Initialize()
     {
         await CreatePlayer();
 
@@ -36,6 +36,13 @@ public class LevelManager : MonoBehaviour, ISceneManager
         if (terrain != null)
         {
             terrain.Initialize();
+        }
+
+        
+        ObjectSpawner objectSpawner = mapInstance.GetComponent<ObjectSpawner>();
+        if (objectSpawner != null)
+        {
+            objectSpawner.Initialize();
         }
     }
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -11,6 +12,8 @@ public class EntryPoint : MonoBehaviour
     public bool IsInitialized { get; private set; }
 
     private IObjectResolver resolver;
+
+    private BaseSceneManager currentSceneManager;
 
     private void Awake()
     {
@@ -47,8 +50,19 @@ public class EntryPoint : MonoBehaviour
         IsInitialized = true;
     }
 
+    private void OnSceneChangedHandler(string sceneName)
+    {
+        if (currentSceneManager != null)
+        {
+            currentSceneManager.OnSceneChanged.RemoveListener(OnSceneChangedHandler);
+        }
+
+        LoadScene(sceneName).Forget();
+    }
+
     public async UniTask LoadScene(string sceneName)
     {
+
         var handle = Addressables.LoadSceneAsync(sceneName);
         await handle.ToUniTask();
 
@@ -56,7 +70,11 @@ public class EntryPoint : MonoBehaviour
         /*await Addressables.LoadSceneAsync(sceneName).ToUniTask();
         await UniTask.Delay(100); // ЗДЕСЬ СЦЕНА НЕ УСПЕВАЕТ ПРОГРУЗИТСЯ И НЕ УСПЕВАЕТСЯ НАЙТИ ОБЪЕКТ ЧЗХ?*/
 
-        var sceneManager = FindAnyObjectByType<LevelManager>();
-        if (sceneManager != null) { await sceneManager.Initialize(); }
+        currentSceneManager = FindAnyObjectByType<BaseSceneManager>();
+        if (currentSceneManager != null)
+        {
+            await currentSceneManager.Initialize();
+            currentSceneManager.OnSceneChanged.AddListener(OnSceneChangedHandler);
+        }
     }
 }

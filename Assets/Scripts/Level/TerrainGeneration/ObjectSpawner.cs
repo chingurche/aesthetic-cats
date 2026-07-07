@@ -71,10 +71,11 @@ public class ObjectSpawner : MonoBehaviour
         return true;
     }
 
-    private void Awake()
+    public void Initialize()
     {
         pool = GetComponent<ObjectPool>();
     }
+    
     private readonly Dictionary<Transform, ChunkObjects> chunkObjects = new();
 
     public void ReleaseChunkObjects(Transform parent)

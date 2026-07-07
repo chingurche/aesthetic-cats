@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5248106143329519697}
   - component: {fileID: 2559853949964559386}
   - component: {fileID: 4945492129905084447}
+  - component: {fileID: 6320070413737995142}
   - component: {fileID: 3788814737302185262}
   - component: {fileID: 7553430600888545384}
   m_Layer: 0
@@ -73,6 +74,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectSpawner
   spawnableObjects:
   - {fileID: 11400000, guid: 784f3b3cc7fb4ef4cbb2879935166f2e, type: 2}
+--- !u!114 &6320070413737995142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4578342180690028632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2df600f63265e843b24138403170008, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectPool
 --- !u!114 &3788814737302185262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,7 +98,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12edeeef6696f4944b3e48576142c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EndlessTerrain
-  viewer: {fileID: 0}
   mapMaterial: {fileID: 2100000, guid: 568925b0cb17da1458efbc5675906a43, type: 2}
 --- !u!114 &7553430600888545384
 MonoBehaviour:
