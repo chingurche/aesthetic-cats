@@ -6,7 +6,7 @@ public class FishManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private AtmosphericFishSwarm swarmPrefab;
-    [SerializeField] private Transform player;
+    private Transform player;
 
     [Header("Spawn")]
     [SerializeField] private int maxGroups = 6;
@@ -36,11 +36,12 @@ public class FishManager : MonoBehaviour
         public AtmosphericFishSwarm Swarm;
     }
 
-    private void Awake()
+    public void Initialize(Transform player)
     {
         pool = GetComponent<ObjectPool>();
 
         if (player != null)
+            this.player = player;
             playerRb = player.GetComponent<Rigidbody>();
     }
     private void Update()

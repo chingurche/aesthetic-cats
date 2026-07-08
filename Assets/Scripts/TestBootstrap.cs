@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class TestBootstrap : MonoBehaviour
 {
+    [SerializeField] private GameObject playerInstance;
+
+
     private async void Start()
     {
         await UniTask.Yield();
@@ -31,6 +34,17 @@ public class TestBootstrap : MonoBehaviour
         else
         {
             Debug.LogError("EndlessTerrain not found.");
+        }
+        
+        ObjectSpawner objectSpawner = FindAnyObjectByType<ObjectSpawner>();
+        if (objectSpawner != null)
+            objectSpawner.Initialize();
+
+            
+        FishManager fishManager = FindAnyObjectByType<FishManager>();
+        if (fishManager != null)
+        {
+            fishManager.Initialize(playerInstance.transform);
         }
     }
 }

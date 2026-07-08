@@ -7,7 +7,7 @@ using VContainer;
 
 public class EndlessTerrain : MonoBehaviour
 {
-    public const float maxViewDst = 300;
+    public const float maxViewDst = 100;
     private Transform viewer;
 
     public Material mapMaterial;
