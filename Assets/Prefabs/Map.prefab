@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6320070413737995142}
   - component: {fileID: 3788814737302185262}
   - component: {fileID: 7553430600888545384}
+  - component: {fileID: 853136838596886323}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -73,6 +74,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectSpawner
   spawnableObjects:
+  - {fileID: 11400000, guid: f64f9dfebeff11b4e9d31bbc631bb4e9, type: 2}
+  - {fileID: 11400000, guid: 80d16639ee097c7429d96cf9276a8e9b, type: 2}
+  - {fileID: 11400000, guid: c68c38e7140fa7f4890eda8c9501edc7, type: 2}
+  - {fileID: 11400000, guid: 8b1a11ea782633d41afadd837c5edb0f, type: 2}
+  - {fileID: 11400000, guid: 9502841436bdfc74889bc423ab7f1ebe, type: 2}
   - {fileID: 11400000, guid: 784f3b3cc7fb4ef4cbb2879935166f2e, type: 2}
 --- !u!114 &6320070413737995142
 MonoBehaviour:
@@ -114,6 +120,25 @@ MonoBehaviour:
   textureRenderer: {fileID: 755128122717048424}
   meshFilter: {fileID: 2989598000181762691}
   meshRenderer: {fileID: 755128122717048424}
+--- !u!114 &853136838596886323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4578342180690028632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 255f90c9952782545b03365163507567, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FishManager
+  swarmPrefab: {fileID: 3406623364164347706, guid: 139c0be66d8240c429698ebfc34a98a6, type: 3}
+  maxGroups: 6
+  fishCountRange: {x: 40, y: 80}
+  despawnRadius: 130
+  minSpawnDistance: 70
+  maxSpawnDistance: 110
+  spawnInterval: 0.7
 --- !u!1 &7369424339076568889
 GameObject:
   m_ObjectHideFlags: 0

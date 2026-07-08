@@ -15,6 +15,8 @@ public class EntryPoint : MonoBehaviour
 
     private BaseSceneManager currentSceneManager;
 
+    [SerializeField] private string startSceneAddress;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -45,7 +47,7 @@ public class EntryPoint : MonoBehaviour
         audioSystem.Initialize();
         saveSystem.Initialize();
 
-        await LoadScene("LevelScene");
+        await LoadScene(startSceneAddress);
 
         IsInitialized = true;
     }

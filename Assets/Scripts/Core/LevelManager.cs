@@ -37,12 +37,17 @@ public class LevelManager : BaseSceneManager
         {
             terrain.Initialize();
         }
-
         
         ObjectSpawner objectSpawner = mapInstance.GetComponent<ObjectSpawner>();
         if (objectSpawner != null)
         {
             objectSpawner.Initialize();
+        }
+
+        FishManager fishManager = mapInstance.GetComponent<FishManager>();
+        if (fishManager != null)
+        {
+            fishManager.Initialize(playerInstance.transform);
         }
     }
 
