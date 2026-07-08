@@ -15,13 +15,18 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 2552e066f18300d4c93d0ab37252e863
   m_SerializeEntries:
+  - m_GUID: 00e3d0764ccc3f442a47faed498036ae
+    m_Address: Scenes/Menu
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1fc826ddc455d09489e89ca80b783d82
     m_Address: Player
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9fc0d4010bbf28b4594072e72b8655ab
-    m_Address: LevelScene
+    m_Address: Scenes/Level
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
