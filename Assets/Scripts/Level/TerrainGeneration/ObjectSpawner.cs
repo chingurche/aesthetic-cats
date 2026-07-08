@@ -514,6 +514,22 @@ public class ObjectSpawner : MonoBehaviour
             GameObject prefab = GetRandomPrefab(spawnable, random);
     
             GameObject obj = pool.Get(prefab, parent);
+            Renderer renderer = obj.GetComponent<Renderer>();
+            
+            if (renderer != null)
+            {
+                MaterialPropertyBlock block = new MaterialPropertyBlock();
+                renderer.GetPropertyBlock(block);
+
+                Color tint = Color.HSVToRGB(
+                    (float)random.NextDouble(),
+                    0.8f,
+                    1f);
+
+                block.SetColor("_Color", tint);
+
+                renderer.SetPropertyBlock(block);
+            }
             chunk.Objects.Add(obj);
 
             SpawnedObject spawnedObject = new SpawnedObject(

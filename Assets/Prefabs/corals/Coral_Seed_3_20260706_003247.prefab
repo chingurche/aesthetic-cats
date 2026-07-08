@@ -142,4 +142,4 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  randomSeed: 0
+  randomSeed: 4
