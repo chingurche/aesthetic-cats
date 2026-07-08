@@ -5,8 +5,8 @@ public class AtmosphericFishSwarm : MonoBehaviour
     [Header("Настройки стаи")]
     public Mesh fishMesh;
     public Material fishMaterial;
-    [Range(10, 2000)]
-    public int fishCount = 1000;
+    [Range(5, 2000)]
+    public int fishCount = 30;
 
     [Header("Размер рыб")]
     [Tooltip("Минимальный масштаб рыбы")]
@@ -47,6 +47,12 @@ public class AtmosphericFishSwarm : MonoBehaviour
     [Tooltip("Сколько секунд рыбы плывут в панике перед исчезновением/возвратом")]
     public float timeToFlee = 5f;
 
+    [Header("Оптимизация")]
+    [Tooltip("Дистанция, на которой стая перестает обновляться и рендериться")]
+    public float maxUpdateDistance = 80f;
+    [Tooltip("Если рыб больше этого числа, включается многопоточность (Parallel.For)")]
+    public int parallelThreshold = 150;
+
     [Header("Коррекция модели")]
     [Tooltip("Если рыбы плывут боком, поменяйте Y на 90 или -90")]
     public Vector3 modelRotationOffset = new Vector3(0, -90f, 0);
@@ -59,15 +65,30 @@ public class AtmosphericFishSwarm : MonoBehaviour
     private Vector3[] newVelocities;
     private Quaternion[] rotations;
     private float[] scales;
+    private float[] groundPushForces;
 
     private bool isCurrentlyScared = false;
     private float currentFleeTime = 0f;
+    private float sqrMaxUpdateDistance;
+    private Camera mainCam;
+
+    private void Start()
+    {
+        mainCam = Camera.main;
+        sqrMaxUpdateDistance = maxUpdateDistance * maxUpdateDistance;
+
+        if (matrices == null || matrices.Length != fishCount)
+        {
+            Initialize(fishCount);
+        }
+    }
 
     public void ResetSwarm()
     {
         isCurrentlyScared = false;
         currentFleeTime = 0f;
     }
+
     public void Initialize(int count)
     {
         isCurrentlyScared = false;
@@ -80,13 +101,14 @@ public class AtmosphericFishSwarm : MonoBehaviour
         newVelocities = new Vector3[fishCount];
         rotations = new Quaternion[fishCount];
         scales = new float[fishCount];
+        groundPushForces = new float[fishCount];
 
         for (int i = 0; i < fishCount; i++)
         {
             positions[i] = transform.position + Random.insideUnitSphere * boundsRadius;
             velocities[i] = Random.onUnitSphere * maxSpeed;
-
             scales[i] = Random.Range(minScale, maxScale);
+            groundPushForces[i] = 0f;
 
             Quaternion lookRot = Quaternion.LookRotation(velocities[i]);
             rotations[i] = lookRot * Quaternion.Euler(modelRotationOffset);
@@ -95,19 +117,22 @@ public class AtmosphericFishSwarm : MonoBehaviour
 
     void Update()
     {
-        float dt = Time.deltaTime;
         Vector3 centerPos = transform.position;
+        Vector3 playerPos = playerTransform != null ? playerTransform.position : Vector3.zero;
 
-        bool playerIsClose = false;
-        Vector3 playerPos = Vector3.zero;
-
-        if (playerTransform != null)
+        Transform targetForCulling = playerTransform != null ? playerTransform : mainCam.transform;
+        if (targetForCulling != null)
         {
-            playerPos = playerTransform.position;
-            if ((centerPos - playerPos).sqrMagnitude < (scareDistance * scareDistance))
-            {
-                playerIsClose = true;
-            }
+            if ((centerPos - targetForCulling.position).sqrMagnitude > sqrMaxUpdateDistance)
+                return;
+        }
+
+        float dt = Time.deltaTime;
+        bool playerIsClose = false;
+
+        if (playerTransform != null && (centerPos - playerPos).sqrMagnitude < (scareDistance * scareDistance))
+        {
+            playerIsClose = true;
         }
 
         if (playerIsClose && !isCurrentlyScared)
@@ -119,7 +144,6 @@ public class AtmosphericFishSwarm : MonoBehaviour
         if (isCurrentlyScared)
         {
             currentFleeTime += dt;
-
             if (currentFleeTime >= timeToFlee)
             {
                 if (!returnIfNotScared)
@@ -127,90 +151,47 @@ public class AtmosphericFishSwarm : MonoBehaviour
                     gameObject.SetActive(false);
                     return;
                 }
-                else
+                else if (!playerIsClose)
                 {
-                    if (!playerIsClose)
-                    {
-                        isCurrentlyScared = false;
-                    }
+                    isCurrentlyScared = false;
                 }
             }
         }
 
-        System.Threading.Tasks.Parallel.For(0, fishCount, i =>
+        if (fishCount >= parallelThreshold)
         {
-            if (isCurrentlyScared)
+            System.Threading.Tasks.Parallel.For(0, fishCount, i =>
             {
-                Vector3 fleeDir = positions[i] - playerPos;
-                if (fleeDir == Vector3.zero) fleeDir = Vector3.up;
-
-                float chaosX = (float)System.Math.Sin(i * 12.34f);
-                float chaosY = (float)System.Math.Cos(i * 56.78f);
-                float chaosZ = (float)System.Math.Sin(i * 90.12f);
-                Vector3 chaos = new Vector3(chaosX, chaosY, chaosZ) * 0.6f;
-
-                Vector3 targetVelocity = (fleeDir.normalized + chaos).normalized * (maxSpeed * scareSpeedMultiplier);
-
-                newVelocities[i] = Vector3.Lerp(velocities[i], targetVelocity, dt * 2.5f);
-
-                return;
-            }
-
-            Vector3 separation = Vector3.zero;
-            Vector3 alignment = Vector3.zero;
-            Vector3 cohesion = Vector3.zero;
-            int numNeighbors = 0;
-
-            for (int j = 0; j < fishCount; j++)
+                CalculateFishVelocity(i, dt, playerPos, centerPos);
+            });
+        }
+        else
+        {
+            for (int i = 0; i < fishCount; i++)
             {
-                if (i == j) continue;
-
-                Vector3 offset = positions[j] - positions[i];
-                float sqrDst = offset.sqrMagnitude;
-
-                if (sqrDst < perceptionRadius * perceptionRadius)
-                {
-                    float dst = (float)System.Math.Sqrt(sqrDst);
-                    separation -= offset / dst;
-                    alignment += velocities[j];
-                    cohesion += positions[j];
-                    numNeighbors++;
-                }
+                CalculateFishVelocity(i, dt, playerPos, centerPos);
             }
-
-            if (numNeighbors > 0)
-            {
-                alignment /= numNeighbors;
-                cohesion = (cohesion / numNeighbors) - positions[i];
-
-                separation = separation.normalized * separationWeight;
-                alignment = alignment.normalized * alignmentWeight;
-                cohesion = cohesion.normalized * cohesionWeight;
-            }
-
-            Vector3 boundsForce = Vector3.zero;
-            Vector3 centerOffset = centerPos - positions[i];
-            if (centerOffset.sqrMagnitude > boundsRadius * boundsRadius)
-            {
-                boundsForce = centerOffset.normalized * boundsWeight;
-            }
-
-            newVelocities[i] = velocities[i] + (separation + alignment + cohesion + boundsForce) * dt;
-
-            if (newVelocities[i].sqrMagnitude > maxSpeed * maxSpeed)
-            {
-                newVelocities[i] = newVelocities[i].normalized * maxSpeed;
-            }
-        });
+        }
 
         for (int i = 0; i < fishCount; i++)
         {
             velocities[i] = newVelocities[i];
 
-            if (Physics.Raycast(positions[i], Vector3.down, out RaycastHit hit, avoidGroundDistance, groundLayer))
+            if ((Time.frameCount + i) % 4 == 0)
             {
-                float pushForce = 1f - (hit.distance / avoidGroundDistance);
-                velocities[i] += Vector3.up * pushForce * avoidGroundWeight * dt;
+                if (Physics.Raycast(positions[i], Vector3.down, out RaycastHit hit, avoidGroundDistance, groundLayer))
+                {
+                    groundPushForces[i] = 1f - (hit.distance / avoidGroundDistance);
+                }
+                else
+                {
+                    groundPushForces[i] = 0f;
+                }
+            }
+
+            if (groundPushForces[i] > 0)
+            {
+                velocities[i] += Vector3.up * groundPushForces[i] * avoidGroundWeight * dt;
             }
 
             positions[i] += velocities[i] * dt;
@@ -219,7 +200,6 @@ public class AtmosphericFishSwarm : MonoBehaviour
             {
                 Quaternion targetLookRot = Quaternion.LookRotation(velocities[i]);
                 Quaternion targetRot = targetLookRot * Quaternion.Euler(modelRotationOffset);
-
                 rotations[i] = Quaternion.Slerp(rotations[i], targetRot, dt * rotationSpeed);
             }
 
@@ -227,6 +207,70 @@ public class AtmosphericFishSwarm : MonoBehaviour
         }
 
         Graphics.DrawMeshInstanced(fishMesh, 0, fishMaterial, matrices, fishCount);
+    }
+
+    private void CalculateFishVelocity(int i, float dt, Vector3 playerPos, Vector3 centerPos)
+    {
+        if (isCurrentlyScared)
+        {
+            Vector3 fleeDir = positions[i] - playerPos;
+            if (fleeDir == Vector3.zero) fleeDir = Vector3.up;
+
+            float chaosX = (float)System.Math.Sin(i * 12.34f);
+            float chaosY = (float)System.Math.Cos(i * 56.78f);
+            float chaosZ = (float)System.Math.Sin(i * 90.12f);
+            Vector3 chaos = new Vector3(chaosX, chaosY, chaosZ) * 0.6f;
+
+            Vector3 targetVelocity = (fleeDir.normalized + chaos).normalized * (maxSpeed * scareSpeedMultiplier);
+            newVelocities[i] = Vector3.Lerp(velocities[i], targetVelocity, dt * 2.5f);
+            return;
+        }
+
+        Vector3 separation = Vector3.zero;
+        Vector3 alignment = Vector3.zero;
+        Vector3 cohesion = Vector3.zero;
+        int numNeighbors = 0;
+
+        for (int j = 0; j < fishCount; j++)
+        {
+            if (i == j) continue;
+
+            Vector3 offset = positions[j] - positions[i];
+            float sqrDst = offset.sqrMagnitude;
+
+            if (sqrDst < perceptionRadius * perceptionRadius)
+            {
+                float dst = (float)System.Math.Sqrt(sqrDst);
+                separation -= offset / dst;
+                alignment += velocities[j];
+                cohesion += positions[j];
+                numNeighbors++;
+            }
+        }
+
+        if (numNeighbors > 0)
+        {
+            alignment /= numNeighbors;
+            cohesion = (cohesion / numNeighbors) - positions[i];
+
+            separation = separation.normalized * separationWeight;
+            alignment = alignment.normalized * alignmentWeight;
+            cohesion = cohesion.normalized * cohesionWeight;
+        }
+
+        Vector3 boundsForce = Vector3.zero;
+        Vector3 centerOffset = centerPos - positions[i];
+        if (centerOffset.sqrMagnitude > boundsRadius * boundsRadius)
+        {
+            boundsForce = centerOffset.normalized * boundsWeight;
+        }
+
+        newVelocities[i] = velocities[i] + (separation + alignment + cohesion + boundsForce) * dt;
+
+        if (newVelocities[i].sqrMagnitude > maxSpeed * maxSpeed)
+        {
+            newVelocities[i] = newVelocities[i].normalized * maxSpeed;
+        }
     }
 
     private void OnDrawGizmosSelected()
