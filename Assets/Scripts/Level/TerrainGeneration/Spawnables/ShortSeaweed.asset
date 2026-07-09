@@ -21,21 +21,20 @@ MonoBehaviour:
     ScaleMultiplierRange: {x: 0, y: 0}
   SpawnChance: 1
   MaxPerChunk: 10
-  MinHeight: -20
-  MaxHeight: 5
+  MinDepth: 20
+  MaxDepth: 180
   MaxSlope: 30
   SpawnRadius: 0.3
-  DensityRadius: 0.6
   Scale: {x: 3.8, y: 3.8, z: 3.8}
   MinScaleMultiplier: 0.8
   MaxScaleMultiplier: 1.35
   UseClusters: 1
   ClusterCount: 5
-  ObjectsPerSquareMeter: 0.1
   MinClusterRadius: 4
   MaxClusterRadius: 8
   MinDistanceBetweenClusters: 15
   MinDistanceToOtherClusters: 17
+  ObjectSpacing: 0.6
   ClusterFalloff: 0.45
   ClusterNoise: 0.6
   AlignToSurface: 0

@@ -20,8 +20,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1fc826ddc455d09489e89ca80b783d82
-    m_Address: Player
+  - m_GUID: 362f588186639e842a32818c258a4191
+    m_Address: map
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -30,8 +30,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: abacf62c6fb08fc4ca3a52143534706d
-    m_Address: Map
+  - m_GUID: c1428b92892340a46b9f64e60dc72000
+    m_Address: player
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

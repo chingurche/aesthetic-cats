@@ -16,13 +16,12 @@ public class TestBootstrap : MonoBehaviour
         {
             controller.Initialize();
 
-            PlayerView playerView = controller.GetComponent<PlayerView>();
-            if (playerView != null)
-                playerView.Initialize(controller.Model);
+            PlayerView playerView = FindAnyObjectByType<PlayerView>();
+            playerView?.Initialize(controller.Model);
 
-            DepthView depthView = controller.GetComponent<DepthView>();
-            if (depthView != null)
-                depthView.Initialize(controller.Model);
+            DepthView depthView = FindAnyObjectByType<DepthView>();
+            depthView?.Initialize(controller.Model);
+            
         }
 
         EndlessTerrain terrain = FindAnyObjectByType<EndlessTerrain>();
@@ -42,9 +41,9 @@ public class TestBootstrap : MonoBehaviour
 
             
         FishManager fishManager = FindAnyObjectByType<FishManager>();
-        if (fishManager != null)
+        if (fishManager != null && controller != null)
         {
-            fishManager.Initialize(playerInstance.transform);
+            fishManager.Initialize(controller.transform);
         }
     }
 }

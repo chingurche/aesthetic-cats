@@ -22,6 +22,7 @@ public class ObjectSpawner : MonoBehaviour
         public readonly List<GameObject> Objects = new();
     }
 
+
     private Vector2Int GetCell(Vector3 position)
     {
         return new Vector2Int(
@@ -258,6 +259,7 @@ public class ObjectSpawner : MonoBehaviour
     Vector2 chunkCoord)
     {
 
+    
     Vector3[] vertices = mesh.vertices;
     Vector3[] normals = mesh.normals;
 
@@ -290,6 +292,7 @@ public class ObjectSpawner : MonoBehaviour
     foreach (var spawnable in spawnableObjects)
     {
        
+       
        if (!spawnable.UseClusters)
         {
             await Spawn(
@@ -321,8 +324,12 @@ public class ObjectSpawner : MonoBehaviour
 
         Vector3 center = meshData.vertices[centerIndex];
 
-        if (center.y < spawnable.MinHeight ||
-        center.y > spawnable.MaxHeight)
+        Vector3 worldPosition = parent.TransformPoint(center);
+
+        float depth = WorldDepth.YToDepth(worldPosition.y);
+
+        if (depth < spawnable.MinDepth ||
+            depth > spawnable.MaxDepth)
         {
             continue;
         }
@@ -425,7 +432,18 @@ public class ObjectSpawner : MonoBehaviour
         }
 
         int spawned = 0;
-        int attempts = Mathf.Min(Mathf.RoundToInt(clusterRadius * clusterRadius * 2f), 700);
+        int attempts;
+
+        if (centerIndex == -1)
+        {
+            attempts = amount * 100; 
+        }
+        else
+        {
+            attempts = Mathf.Min(
+                Mathf.RoundToInt(clusterRadius * clusterRadius * 2f),
+                700);
+        }
 
 
 
@@ -487,8 +505,12 @@ public class ObjectSpawner : MonoBehaviour
                 out position,
                 out normal);
             // Проверка высоты
-            if (position.y < spawnable.MinHeight ||
-                position.y > spawnable.MaxHeight)
+            Vector3 worldPosition = parent.TransformPoint(position);
+
+            float depth = WorldDepth.YToDepth(worldPosition.y);
+
+            if (depth < spawnable.MinDepth ||
+                depth > spawnable.MaxDepth)
             {
                 continue;
             }
@@ -498,6 +520,7 @@ public class ObjectSpawner : MonoBehaviour
 
             if (slope > spawnable.MaxSlope)
             {
+              
                 continue;
             }
 
@@ -506,13 +529,18 @@ public class ObjectSpawner : MonoBehaviour
             // Проверка шанса появления
             if (random.NextDouble() > spawnable.SpawnChance)
             {
+     
                 continue;
             }
 
             if (!CanSpawn(position, spawnable.SpawnRadius))
-            continue;
+            {
+               
+                continue;
+            }
 
             GameObject prefab = GetRandomPrefab(spawnable, random);
+            //Debug.Log($"Spawn {prefab.name}");
     
             GameObject obj = pool.Get(prefab, parent);
             Renderer renderer = obj.GetComponent<Renderer>();

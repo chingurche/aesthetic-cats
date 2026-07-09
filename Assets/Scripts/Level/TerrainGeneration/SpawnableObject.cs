@@ -17,11 +17,13 @@ public class SpawnableObject : ScriptableObject
 
     [Header("Terrain Restrictions")]
 
-    [Tooltip("Minimum terrain height where this object can spawn.")]
-    public float MinHeight = -100;
+    [Header("Depth Restrictions")]
 
-    [Tooltip("Maximum terrain height where this object can spawn.")]
-    public float MaxHeight = 100;
+    [Tooltip("Minimum depth (meters) where this object can spawn.")]
+    public float MinDepth = 0f;
+
+    [Tooltip("Maximum depth (meters) where this object can spawn.")]
+    public float MaxDepth = 1000f;
 
     [Tooltip("Maximum allowed terrain slope in degrees. Objects will not spawn on steeper surfaces.")]
     [Range(0, 90)]

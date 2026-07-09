@@ -24,8 +24,8 @@ MonoBehaviour:
     ScaleMultiplierRange: {x: 0, y: 0}
   SpawnChance: 0.9
   MaxPerChunk: 0
-  MinHeight: -30
-  MaxHeight: -15
+  MinDepth: 20
+  MaxDepth: 180
   MaxSlope: 30
   SpawnRadius: 0.4
   Scale: {x: 4.8, y: 4.8, z: 4.8}

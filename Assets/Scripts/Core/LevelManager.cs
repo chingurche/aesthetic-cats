@@ -39,9 +39,17 @@ public class LevelManager : BaseSceneManager
         }
         
         ObjectSpawner objectSpawner = mapInstance.GetComponent<ObjectSpawner>();
+
         if (objectSpawner != null)
         {
             objectSpawner.Initialize();
+        }
+
+        WaterCausticsAnimator caustics =mapInstance.GetComponentInChildren<WaterCausticsAnimator>();
+
+        if (caustics != null)
+        {
+            caustics.Initialize(playerInstance.transform);
         }
 
         FishManager fishManager = mapInstance.GetComponent<FishManager>();
@@ -66,7 +74,7 @@ public class LevelManager : BaseSceneManager
 
         PlayerModel playerModel = playerController.Model;
 
-        PlayerView playerView = playerInstance.GetComponent<PlayerView>();
+        PlayerView playerView = playerInstance.GetComponentInChildren<PlayerView>(true);
         if (playerView != null) { playerView.Initialize(playerModel); }
         
         DepthView depthView = playerInstance.GetComponent<DepthView>();

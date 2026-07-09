@@ -3,7 +3,6 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Setting")]
-    [SerializeField] private Transform player;
     [SerializeField] private float startDepth;
     [SerializeField] private float depthForY;
 
@@ -30,6 +29,6 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateDepth()
     {
-        model.Depth = startDepth - (player.position.y * depthForY);
+        model.Depth = WorldDepth.YToDepth(transform.position.y);
     }
 }

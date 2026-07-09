@@ -10,28 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e38636f6038dda4c9e58ac06c73f256, type: 3}
-  m_Name: Grass
+  m_Name: Steering Wheel
   m_EditorClassIdentifier: Assembly-CSharp::SpawnableObject
   Prefabs:
-  - Prefab: {fileID: 7905528536584458497, guid: cfffac162150621498d4954802747319, type: 3}
+  - Prefab: {fileID: 2336686116286386616, guid: 70a71708b9c28f042beda39676394d31, type: 3}
     Weight: 0
     ScaleMultiplierRange: {x: 0, y: 0}
-  SpawnChance: 1
-  MaxPerChunk: 10
-  MinDepth: 20
-  MaxDepth: 120
-  MaxSlope: 30
-  SpawnRadius: 0.3
+  SpawnChance: 0.015
+  MaxPerChunk: 2
+  MinDepth: 180
+  MaxDepth: 500
+  MaxSlope: 35
+  SpawnRadius: 10
   Scale: {x: 1, y: 1, z: 1}
   MinScaleMultiplier: 1
   MaxScaleMultiplier: 1
-  UseClusters: 1
-  ClusterCount: 5
-  MinClusterRadius: 4
-  MaxClusterRadius: 8
+  UseClusters: 0
+  ClusterCount: 2
+  MinClusterRadius: 3
+  MaxClusterRadius: 6
   MinDistanceBetweenClusters: 15
   MinDistanceToOtherClusters: 15
   ObjectSpacing: 1
   ClusterFalloff: 0.5
   ClusterNoise: 0.3
-  AlignToSurface: 0
+  AlignToSurface: 1

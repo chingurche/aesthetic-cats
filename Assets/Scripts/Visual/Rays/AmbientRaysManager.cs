@@ -48,6 +48,11 @@ public class AmbientRaysManager : MonoBehaviour
     [Tooltip("Резкость бликов. Выше = тоньше и острее струи света")]
     [Range(1f, 10f)] public float causticSharpness = 4.0f;
 
+    [Header("Depth Fade")]
+    [SerializeField] private float fadeStartDepth = 150f;
+    [SerializeField] private float fadeEndDepth = 300f;
+
+    [SerializeField] private Transform player;
     private class RayData
     {
         public GameObject gameObject;
@@ -176,12 +181,28 @@ public class AmbientRaysManager : MonoBehaviour
             SetRayCount(rayCount);
         }
 
+        float depth = WorldDepth.YToDepth(player.position.y);
+
+        float depthFade = 1f - Mathf.Clamp01(Mathf.InverseLerp(fadeStartDepth, fadeEndDepth, depth));
+
+        
+
         Vector3 camPos = transform.position;
         Vector3 rayUp = Quaternion.Euler(sunRotation) * Vector3.up;
 
         for (int i = activeRays.Count - 1; i >= 0; i--)
         {
             RayData ray = activeRays[i];
+
+            if (depthFade <= 0.001f)
+            {
+                ray.gameObject.SetActive(false);
+                continue;
+            }
+            else if (!ray.gameObject.activeSelf)
+            {
+                ray.gameObject.SetActive(true);
+            }
 
             ray.lifetime += Time.deltaTime;
             float t = ray.lifetime / ray.maxLifetime;
@@ -209,7 +230,7 @@ public class AmbientRaysManager : MonoBehaviour
             else if (t > 0.8f) alphaMultiplier = Mathf.Lerp(1f, 0f, (t - 0.8f) / 0.2f);
 
             Color c = baseColor;
-            c.a *= alphaMultiplier;
+            c.a *= alphaMultiplier * depthFade;
             ray.material.SetColor("_Color", c);
 
             ray.transform.Translate(ray.driftDir * Time.deltaTime, Space.World);
