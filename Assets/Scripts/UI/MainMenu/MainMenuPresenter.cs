@@ -1,42 +1,76 @@
 using System;
 using UnityEngine;
 using VContainer.Unity;
+using Core.Economy;
+using Core.Gameplay;
 
 namespace UI.MainMenu
 {
     public class MainMenuPresenter : IStartable, IDisposable
     {
+        private readonly MainMenuModel _model;
         private readonly MainMenuView _view;
+        private readonly DivingModel _divingModel;
+        private readonly UIManager _uiManager;
 
-        // VContainer сам прокинет сюда вьюшку, которую мы зарегистрируем в коде ниже
-        public MainMenuPresenter(MainMenuView view)
+        public MainMenuPresenter(
+            MainMenuModel model,
+            MainMenuView view,
+            DivingModel divingModel,
+            UIManager uiManager)
         {
+            _model = model;
             _view = view;
+            _divingModel = divingModel;
+            _uiManager = uiManager;
         }
 
         public void Start()
         {
-            // Подписываемся на события кнопок из View
-            _view.OnUpgradeSuitClicked += HandleUpgrade;
+            RefreshView();
+
+            _view.OnUpgradeSuitClicked += HandleUpgradeRequest;
             _view.OnStartGameClicked += HandleStartGame;
-            
-            Debug.Log("Presenter Главного меню успешно запущен!");
+
+            _model.OnMoneyChanged += _view.UpdateMoneyDisplay;
+            _model.OnSuitUpgraded += _view.UpdateUpgradeCost;
+            _uiManager.OnScreenChanged += HandleScreenChanged;
         }
 
-        private void HandleUpgrade()
+        private void HandleScreenChanged(UIScreen screen)
         {
-            Debug.Log("Кликнули апгрейд! Тут будет списывание денег через Модель.");
+            if (screen == UIScreen.MainMenu)
+                RefreshView();
+        }
+
+        private void RefreshView()
+        {
+            _view.UpdateMoneyDisplay(_model.PlayerMoney);
+            _view.UpdateUpgradeCost(_model.UpgradeCost, _model.SuitLevel);
+        }
+
+        private void HandleUpgradeRequest()
+        {
+            if (!_model.TryUpgradeSuit())
+                Debug.Log("Не хватает золота для улучшения костюма!");
         }
 
         private void HandleStartGame()
         {
-            Debug.Log("Погружение началось! Запускаем генерацию карты...");
+            _divingModel.StartRun();
+            _uiManager.ShowGameplayHUD();
+
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         public void Dispose()
         {
-            _view.OnUpgradeSuitClicked -= HandleUpgrade;
+            _view.OnUpgradeSuitClicked -= HandleUpgradeRequest;
             _view.OnStartGameClicked -= HandleStartGame;
+            _model.OnMoneyChanged -= _view.UpdateMoneyDisplay;
+            _model.OnSuitUpgraded -= _view.UpdateUpgradeCost;
+            _uiManager.OnScreenChanged -= HandleScreenChanged;
         }
     }
 }

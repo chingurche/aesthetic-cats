@@ -9,28 +9,38 @@ namespace UI.MainMenu
     {
         [Header("UI Elements")]
         [SerializeField] private TextMeshProUGUI moneyText;
+        [SerializeField] private TextMeshProUGUI upgradeCostText;
         [SerializeField] private Button upgradeSuitButton;
-        [SerializeField] private TextMeshProUGUI upgradeButtonText;
         [SerializeField] private Button startGameButton;
-        
-        
+
         public event Action OnUpgradeSuitClicked;
         public event Action OnStartGameClicked;
 
         private void Awake()
         {
-            upgradeSuitButton.onClick.AddListener(() => OnUpgradeSuitClicked?.Invoke());
-            startGameButton.onClick.AddListener(() => OnStartGameClicked?.Invoke());
-        }
-        
-        public void UpdateMoneyDisply (int currentMoney)
-        {
-            moneyText.text = $"Денюжки: {currentMoney}";
+            if (upgradeSuitButton != null)
+                upgradeSuitButton.onClick.AddListener(() => OnUpgradeSuitClicked?.Invoke());
+
+            if (startGameButton != null)
+                startGameButton.onClick.AddListener(() => OnStartGameClicked?.Invoke());
         }
 
-        public void UpdateUpgradeCost(int cost, int currentLevel)
+        // Этот метод обновляет золото на экране
+        public void UpdateMoneyDisplay(int money)
         {
-            upgradeButtonText.text = $"Улучшение одежды до Lv.{currentLevel + 1} ({cost})";
+            if (moneyText != null)
+            {
+                moneyText.text = $"Money: ${money}";
+            }
+        }
+
+        // Этот метод обновляет стоимость апгрейда костюма
+        public void UpdateUpgradeCost(int cost, int level)
+        {
+            if (upgradeCostText != null)
+            {
+                upgradeCostText.text = $"Upgrade Suit (Lvl {level}): ${cost}";
+            }
         }
     }
 }

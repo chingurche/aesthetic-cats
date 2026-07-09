@@ -15,19 +15,20 @@ namespace UI.HUD
         // value будет приходить от 0.0 (пусто) до 1.0 (полный баллон)
         public void UpdateOxygen(float value)
         {
-            oxygenSlider.value = value;
+            if (oxygenSlider != null)
+                oxygenSlider.value = value;
         }
 
-        // Метод для обновления метров глубины
         public void UpdateDepth(int meters)
         {
-            depthText.text = $"DEPTH: {meters}m";
+            if (depthText != null)
+                depthText.text = $"DEPTH: {meters}m";
         }
 
-        // Метод для обновления счетчика рюкзака
         public void UpdateInventory(int currentLoot, int maxLoot)
         {
-            inventoryText.text = $"LOOT: {currentLoot} / {maxLoot}";
+            if (inventoryText != null)
+                inventoryText.text = $"LOOT: {currentLoot} / {maxLoot}";
         }
     }
 }
