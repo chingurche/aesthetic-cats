@@ -1,21 +1,28 @@
-using UnityEngine;
-using UnityEngine.Events;
+using Core.Economy;
+using Core.Gameplay;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.Events;
 using VContainer;
+using UI;
 
+[DefaultExecutionOrder(-100)]
 public class EntryPoint : MonoBehaviour
 {
     public static EntryPoint Instance { get; private set; }
 
     public bool IsInitialized { get; private set; }
-
-    private IObjectResolver resolver;
-
-    private BaseSceneManager currentSceneManager;
+    public PlayerModel PlayerModel { get; private set; }
+    public MainMenuModel EconomyModel { get; private set; }
+    public DivingModel DivingModel { get; private set; }
 
     [SerializeField] private string startSceneAddress;
+    [SerializeField] private GameObject uiRootPrefab;
+
+    private IObjectResolver resolver;
+    private BaseSceneManager currentSceneManager;
 
     private void Awake()
     {
@@ -27,6 +34,22 @@ public class EntryPoint : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        EnsureUiRoot();
+    }
+
+    private void EnsureUiRoot()
+    {
+        if (GetComponentInChildren<UIManager>(true) != null)
+            return;
+
+        if (uiRootPrefab == null)
+        {
+            Debug.LogWarning("EntryPoint: uiRootPrefab is not assigned. UI will not be available.");
+            return;
+        }
+
+        Instantiate(uiRootPrefab, transform);
     }
 
     private async void Start()
@@ -38,14 +61,24 @@ public class EntryPoint : MonoBehaviour
     {
         await Addressables.InitializeAsync().ToUniTask();
 
-        var scope = FindAnyObjectByType<GameLifetimeScope>();
-        if (scope != null) { resolver = scope.Container; }
+        var scope = GetComponent<GameLifetimeScope>();
+        if (scope == null)
+        {
+            Debug.LogError("EntryPoint: GameLifetimeScope not found on the same GameObject.");
+            return;
+        }
 
-        AudioSystem audioSystem = resolver.Resolve<AudioSystem>();
-        SaveSystem saveSystem = resolver.Resolve<SaveSystem>();
+        resolver = scope.Container;
+
+        PlayerModel = resolver.Resolve<PlayerModel>();
+        EconomyModel = resolver.Resolve<MainMenuModel>();
+        DivingModel = resolver.Resolve<DivingModel>();
+
+        var audioSystem = resolver.Resolve<AudioSystem>();
+        var saveSystem = resolver.Resolve<SaveSystem>();
 
         audioSystem.Initialize();
-        saveSystem.Initialize();
+        saveSystem.Initialize(EconomyModel, PlayerModel);
 
         await LoadScene(startSceneAddress);
 
@@ -55,22 +88,16 @@ public class EntryPoint : MonoBehaviour
     private void OnSceneChangedHandler(string sceneName)
     {
         if (currentSceneManager != null)
-        {
             currentSceneManager.OnSceneChanged.RemoveListener(OnSceneChangedHandler);
-        }
 
         LoadScene(sceneName).Forget();
     }
 
     public async UniTask LoadScene(string sceneName)
     {
-
         var handle = Addressables.LoadSceneAsync(sceneName);
         await handle.ToUniTask();
-
         await UniTask.WaitUntil(() => handle.Status == AsyncOperationStatus.Succeeded);
-        /*await Addressables.LoadSceneAsync(sceneName).ToUniTask();
-        await UniTask.Delay(100); // ЗДЕСЬ СЦЕНА НЕ УСПЕВАЕТ ПРОГРУЗИТСЯ И НЕ УСПЕВАЕТСЯ НАЙТИ ОБЪЕКТ ЧЗХ?*/
 
         currentSceneManager = FindAnyObjectByType<BaseSceneManager>();
         if (currentSceneManager != null)

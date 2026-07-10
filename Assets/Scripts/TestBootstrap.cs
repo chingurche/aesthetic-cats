@@ -14,15 +14,17 @@ public class TestBootstrap : MonoBehaviour
 
         if (controller != null)
         {
-            controller.Initialize();
+            var playerModel = new PlayerModel();
+            playerModel.ResetForRun();
+            controller.Initialize(playerModel);
 
             PlayerView playerView = controller.GetComponent<PlayerView>();
             if (playerView != null)
-                playerView.Initialize(controller.Model);
+                playerView.Initialize(playerModel);
 
             DepthView depthView = controller.GetComponent<DepthView>();
             if (depthView != null)
-                depthView.Initialize(controller.Model);
+                depthView.Initialize(playerModel);
         }
 
         EndlessTerrain terrain = FindAnyObjectByType<EndlessTerrain>();

@@ -1,17 +1,25 @@
 using System.Collections.Generic;
+using Infrastructure;
 using UnityEngine;
+using VContainer;
 
 public class Inventory : MonoBehaviour
 {
-    private List<ItemData> items = new List<ItemData>();
-    private int totalMoney = 0;
+    private readonly List<ItemData> items = new();
+    private DivingGameplayBridge divingBridge;
+
+    [Inject]
+    public void Construct(DivingGameplayBridge divingBridge)
+    {
+        this.divingBridge = divingBridge;
+    }
 
     public void AddItem(ItemData item)
     {
         items.Add(item);
-        totalMoney += item.MarketValue;
+        divingBridge?.AddLoot(1);
 
         Debug.Log($"[Инвентарь] Подобрано: {item.ItemName}. Описание: {item.ItemDescription}");
-        Debug.Log($"[Кошелек] +{item.MarketValue} монет. Всего денег: {totalMoney}");
+        Debug.Log($"[Кошелек] Предмет добавлен в забег. Всего предметов: {items.Count}");
     }
 }

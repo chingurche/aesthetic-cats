@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EntryPoint
   startSceneAddress: Scenes/Level
+  uiRootPrefab: {fileID: 6710215346843027393, guid: c7b55ceb0b4e0414ab474cb5bd9599b8, type: 3}
 --- !u!4 &559216499
 Transform:
   m_ObjectHideFlags: 0

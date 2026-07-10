@@ -33,24 +33,15 @@ namespace Core.Gameplay
             NotifyAll();
         }
 
-        public void Tick(float oxygenDrain)
+        public void SyncOxygen(float value)
         {
-            if (!IsActive)
-                return;
-
-            CurrentOxygen = Math.Max(0f, CurrentOxygen - oxygenDrain);
+            CurrentOxygen = Math.Clamp(value, 0f, 1f);
             OnOxygenChanged?.Invoke(CurrentOxygen);
-
-            if (CurrentOxygen <= 0f)
-                FinishRun(RunEndReason.OxygenDepleted);
         }
 
-        public void AddDepth(int meters)
+        public void SyncDepth(int meters)
         {
-            if (!IsActive || meters <= 0)
-                return;
-
-            CurrentDepth += meters;
+            CurrentDepth = Math.Max(0, meters);
             OnDepthChanged?.Invoke(CurrentDepth);
         }
 

@@ -1677,7 +1677,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8925793663183191465}
-  - component: {fileID: 8881524912633448005}
   - component: {fileID: 5004210392627884567}
   m_Layer: 0
   m_Name: GameContext
@@ -1701,27 +1700,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8862760082013778834}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8881524912633448005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6710215346843027393}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fee2994e60744aeb132a3901651a2b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Infrastructure.GameLifetimeScope
-  parentReference:
-    TypeName: 
-  autoRun: 1
-  autoInjectGameObjects: []
-  uiManager: {fileID: 5004210392627884567}
-  mainMenuView: {fileID: -2232740313511048393}
-  hudView: {fileID: 0}
-  pauseView: {fileID: 0}
-  resultsView: {fileID: 0}
 --- !u!114 &5004210392627884567
 MonoBehaviour:
   m_ObjectHideFlags: 0

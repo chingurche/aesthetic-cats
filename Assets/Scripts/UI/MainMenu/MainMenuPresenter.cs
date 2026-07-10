@@ -1,8 +1,8 @@
 using System;
-using UnityEngine;
-using VContainer.Unity;
 using Core.Economy;
 using Core.Gameplay;
+using UnityEngine;
+using VContainer.Unity;
 
 namespace UI.MainMenu
 {
@@ -10,18 +10,24 @@ namespace UI.MainMenu
     {
         private readonly MainMenuModel _model;
         private readonly MainMenuView _view;
+        private readonly PlayerModel _playerModel;
         private readonly DivingModel _divingModel;
+        private readonly SaveSystem _saveSystem;
         private readonly UIManager _uiManager;
 
         public MainMenuPresenter(
             MainMenuModel model,
             MainMenuView view,
+            PlayerModel playerModel,
             DivingModel divingModel,
+            SaveSystem saveSystem,
             UIManager uiManager)
         {
             _model = model;
             _view = view;
+            _playerModel = playerModel;
             _divingModel = divingModel;
+            _saveSystem = saveSystem;
             _uiManager = uiManager;
         }
 
@@ -52,11 +58,17 @@ namespace UI.MainMenu
         private void HandleUpgradeRequest()
         {
             if (!_model.TryUpgradeSuit())
+            {
                 Debug.Log("Не хватает золота для улучшения костюма!");
+                return;
+            }
+
+            _saveSystem.SaveProgress(_model);
         }
 
         private void HandleStartGame()
         {
+            _playerModel.ResetForRun();
             _divingModel.StartRun();
             _uiManager.ShowGameplayHUD();
 

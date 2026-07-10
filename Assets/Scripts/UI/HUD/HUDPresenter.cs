@@ -1,17 +1,25 @@
 using System;
-using VContainer.Unity;
+using Core.Economy;
 using Core.Gameplay;
+using UnityEngine;
+using VContainer.Unity;
 
 namespace UI.HUD
 {
     public class HUDPresenter : IStartable, IDisposable
     {
+        private readonly PlayerModel _playerModel;
         private readonly DivingModel _divingModel;
         private readonly HUDView _view;
         private readonly UIManager _uiManager;
 
-        public HUDPresenter(DivingModel divingModel, HUDView view, UIManager uiManager)
+        public HUDPresenter(
+            PlayerModel playerModel,
+            DivingModel divingModel,
+            HUDView view,
+            UIManager uiManager)
         {
+            _playerModel = playerModel;
             _divingModel = divingModel;
             _view = view;
             _uiManager = uiManager;
@@ -19,8 +27,9 @@ namespace UI.HUD
 
         public void Start()
         {
-            _divingModel.OnOxygenChanged += _view.UpdateOxygen;
-            _divingModel.OnDepthChanged += _view.UpdateDepth;
+            _playerModel.OnOxygenChanged += _view.UpdateOxygen;
+            _playerModel.OnHealthChanged += _view.UpdateHealth;
+            _playerModel.OnDepthChanged += HandleDepthChanged;
             _divingModel.OnInventoryChanged += _view.UpdateInventory;
             _divingModel.OnRunEnded += HandleRunEnded;
             _uiManager.OnScreenChanged += HandleScreenChanged;
@@ -32,10 +41,16 @@ namespace UI.HUD
                 RefreshView();
         }
 
+        private void HandleDepthChanged(float depth)
+        {
+            _view.UpdateDepth(Mathf.RoundToInt(depth));
+        }
+
         private void RefreshView()
         {
-            _view.UpdateOxygen(_divingModel.CurrentOxygen);
-            _view.UpdateDepth(_divingModel.CurrentDepth);
+            _view.UpdateOxygen(_playerModel.Oxygen);
+            _view.UpdateHealth(_playerModel.Health, _playerModel.MaxHealth);
+            _view.UpdateDepth(Mathf.RoundToInt(_playerModel.Depth));
             _view.UpdateInventory(_divingModel.CurrentLoot, _divingModel.MaxLoot);
         }
 
@@ -46,8 +61,9 @@ namespace UI.HUD
 
         public void Dispose()
         {
-            _divingModel.OnOxygenChanged -= _view.UpdateOxygen;
-            _divingModel.OnDepthChanged -= _view.UpdateDepth;
+            _playerModel.OnOxygenChanged -= _view.UpdateOxygen;
+            _playerModel.OnHealthChanged -= _view.UpdateHealth;
+            _playerModel.OnDepthChanged -= HandleDepthChanged;
             _divingModel.OnInventoryChanged -= _view.UpdateInventory;
             _divingModel.OnRunEnded -= HandleRunEnded;
             _uiManager.OnScreenChanged -= HandleScreenChanged;

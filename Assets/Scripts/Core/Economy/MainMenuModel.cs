@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Core.Economy
 {
@@ -11,6 +12,14 @@ namespace Core.Economy
 
         public event Action<int> OnMoneyChanged;
         public event Action<int, int> OnSuitUpgraded;
+
+        public void LoadProgress(int money, int suitLevel)
+        {
+            PlayerMoney = money;
+            SuitLevel = Mathf.Max(1, suitLevel);
+            OnMoneyChanged?.Invoke(PlayerMoney);
+            OnSuitUpgraded?.Invoke(UpgradeCost, SuitLevel);
+        }
 
         public bool TryUpgradeSuit()
         {

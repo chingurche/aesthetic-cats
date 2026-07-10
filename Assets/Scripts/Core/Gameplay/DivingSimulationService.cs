@@ -10,12 +10,17 @@ namespace Core.Gameplay
     {
         private const float BaseOxygenDrainPerSecond = 0.05f;
 
+        private readonly PlayerModel _playerModel;
         private readonly DivingModel _divingModel;
         private readonly MainMenuModel _economyModel;
         private CancellationTokenSource _cts;
 
-        public DivingSimulationService(DivingModel divingModel, MainMenuModel economyModel)
+        public DivingSimulationService(
+            PlayerModel playerModel,
+            DivingModel divingModel,
+            MainMenuModel economyModel)
         {
+            _playerModel = playerModel;
             _divingModel = divingModel;
             _economyModel = economyModel;
         }
@@ -42,7 +47,7 @@ namespace Core.Gameplay
                     continue;
 
                 var drain = BaseOxygenDrainPerSecond * UnityEngine.Time.deltaTime / _economyModel.OxygenEfficiency;
-                _divingModel.Tick(drain);
+                _playerModel.DrainOxygen(drain);
             }
         }
     }

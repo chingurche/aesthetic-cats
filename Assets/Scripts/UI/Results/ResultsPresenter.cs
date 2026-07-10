@@ -1,7 +1,7 @@
 using System;
-using VContainer.Unity;
 using Core.Economy;
 using Core.Gameplay;
+using VContainer.Unity;
 
 namespace UI.Results
 {
@@ -9,7 +9,9 @@ namespace UI.Results
     {
         private readonly ResultsView _view;
         private readonly MainMenuModel _economyModel;
+        private readonly PlayerModel _playerModel;
         private readonly DivingModel _divingModel;
+        private readonly SaveSystem _saveSystem;
         private readonly UIManager _uiManager;
 
         private bool _rewardsProcessed;
@@ -17,12 +19,16 @@ namespace UI.Results
         public ResultsPresenter(
             ResultsView view,
             MainMenuModel economyModel,
+            PlayerModel playerModel,
             DivingModel divingModel,
+            SaveSystem saveSystem,
             UIManager uiManager)
         {
             _view = view;
             _economyModel = economyModel;
+            _playerModel = playerModel;
             _divingModel = divingModel;
+            _saveSystem = saveSystem;
             _uiManager = uiManager;
         }
 
@@ -47,6 +53,7 @@ namespace UI.Results
 
             var moneyEarned = _divingModel.CalculateEarnings();
             _economyModel.AddEarnedMoney(moneyEarned);
+            _saveSystem.SaveProgress(_economyModel);
 
             _view.DisplayResults(
                 reason: FormatEndReason(_divingModel.EndReason),
@@ -60,6 +67,7 @@ namespace UI.Results
             return reason switch
             {
                 RunEndReason.OxygenDepleted => "OXYGEN DEPLETED",
+                RunEndReason.HealthDepleted => "CRITICAL DAMAGE",
                 RunEndReason.Surfaced => "SURFACED",
                 _ => "RUN COMPLETE"
             };
@@ -67,6 +75,7 @@ namespace UI.Results
 
         private void HandleReturnToBase()
         {
+            _playerModel.ResetForRun();
             _divingModel.ResetForNewRun();
             _rewardsProcessed = false;
             _uiManager.ShowMainMenu();

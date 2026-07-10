@@ -4,6 +4,7 @@ namespace Core.Gameplay
     {
         None,
         OxygenDepleted,
+        HealthDepleted,
         Surfaced
     }
 }

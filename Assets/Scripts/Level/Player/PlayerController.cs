@@ -10,20 +10,18 @@ public class PlayerController : MonoBehaviour
     private PlayerModel model;
     public PlayerModel Model => model;
 
-    private bool isInitialized = false;
+    private bool isInitialized;
 
-    public void Initialize()
+    public void Initialize(PlayerModel playerModel)
     {
-        model = new PlayerModel();
-        
-        model.Depth = 0f;
-        
+        model = playerModel;
         isInitialized = true;
     }
 
     private void FixedUpdate()
     {
-        if (!isInitialized) return;
+        if (!isInitialized || model == null)
+            return;
 
         UpdateDepth();
     }

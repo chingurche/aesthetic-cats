@@ -9,17 +9,20 @@ namespace UI.Pause
     public class PausePresenter : IStartable, ITickable, IDisposable
     {
         private readonly GamePauseModel _pauseModel;
+        private readonly PlayerModel _playerModel;
         private readonly DivingModel _divingModel;
         private readonly PauseView _view;
         private readonly UIManager _uiManager;
 
         public PausePresenter(
             GamePauseModel pauseModel,
+            PlayerModel playerModel,
             DivingModel divingModel,
             PauseView view,
             UIManager uiManager)
         {
             _pauseModel = pauseModel;
+            _playerModel = playerModel;
             _divingModel = divingModel;
             _view = view;
             _uiManager = uiManager;
@@ -68,6 +71,7 @@ namespace UI.Pause
         private void HandleQuitToMenu()
         {
             _pauseModel.SetPaused(false);
+            _playerModel.ResetForRun();
             _divingModel.ResetForNewRun();
             _uiManager.ShowMainMenu();
             ApplyCursor(true);
